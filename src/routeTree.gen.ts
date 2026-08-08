@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
 import { Route as AuthenticatedGiocaRouteImport } from './routes/_authenticated/gioca'
 import { Route as AuthenticatedMissioniRouteImport } from './routes/_authenticated/missioni'
 import { Route as AuthenticatedShopRouteImport } from './routes/_authenticated/shop'
@@ -29,6 +30,11 @@ const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedChatRoute = AuthenticatedChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedGiocaRoute = AuthenticatedGiocaRouteImport.update({
   id: '/gioca',
@@ -49,6 +55,7 @@ const AuthenticatedShopRoute = AuthenticatedShopRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/chat': typeof AuthenticatedChatRoute
   '/gioca': typeof AuthenticatedGiocaRoute
   '/missioni': typeof AuthenticatedMissioniRoute
   '/shop': typeof AuthenticatedShopRoute
@@ -56,6 +63,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/chat': typeof AuthenticatedChatRoute
   '/gioca': typeof AuthenticatedGiocaRoute
   '/missioni': typeof AuthenticatedMissioniRoute
   '/shop': typeof AuthenticatedShopRoute
@@ -65,20 +73,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/chat': typeof AuthenticatedChatRoute
   '/_authenticated/gioca': typeof AuthenticatedGiocaRoute
   '/_authenticated/missioni': typeof AuthenticatedMissioniRoute
   '/_authenticated/shop': typeof AuthenticatedShopRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/gioca' | '/missioni' | '/shop'
+  fullPaths: '/' | '/auth' | '/chat' | '/gioca' | '/missioni' | '/shop'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/gioca' | '/missioni' | '/shop'
+  to: '/' | '/auth' | '/chat' | '/gioca' | '/missioni' | '/shop'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/chat'
     | '/_authenticated/gioca'
     | '/_authenticated/missioni'
     | '/_authenticated/shop'
@@ -113,6 +123,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/chat': {
+      id: '/_authenticated/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof AuthenticatedChatRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/gioca': {
       id: '/_authenticated/gioca'
       path: '/gioca'
@@ -138,12 +155,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedChatRoute: typeof AuthenticatedChatRoute
   AuthenticatedGiocaRoute: typeof AuthenticatedGiocaRoute
   AuthenticatedMissioniRoute: typeof AuthenticatedMissioniRoute
   AuthenticatedShopRoute: typeof AuthenticatedShopRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedChatRoute: AuthenticatedChatRoute,
   AuthenticatedGiocaRoute: AuthenticatedGiocaRoute,
   AuthenticatedMissioniRoute: AuthenticatedMissioniRoute,
   AuthenticatedShopRoute: AuthenticatedShopRoute,
