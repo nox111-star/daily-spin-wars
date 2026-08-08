@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedGiocaRouteImport } from './routes/_authenticated/gioca'
 import { Route as AuthenticatedMissioniRouteImport } from './routes/_authenticated/missioni'
+import { Route as AuthenticatedShopRouteImport } from './routes/_authenticated/shop'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -39,18 +40,25 @@ const AuthenticatedMissioniRoute = AuthenticatedMissioniRouteImport.update({
   path: '/missioni',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedShopRoute = AuthenticatedShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/gioca': typeof AuthenticatedGiocaRoute
   '/missioni': typeof AuthenticatedMissioniRoute
+  '/shop': typeof AuthenticatedShopRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/gioca': typeof AuthenticatedGiocaRoute
   '/missioni': typeof AuthenticatedMissioniRoute
+  '/shop': typeof AuthenticatedShopRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -59,12 +67,13 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/gioca': typeof AuthenticatedGiocaRoute
   '/_authenticated/missioni': typeof AuthenticatedMissioniRoute
+  '/_authenticated/shop': typeof AuthenticatedShopRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/gioca' | '/missioni'
+  fullPaths: '/' | '/auth' | '/gioca' | '/missioni' | '/shop'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/gioca' | '/missioni'
+  to: '/' | '/auth' | '/gioca' | '/missioni' | '/shop'
   id:
     | '__root__'
     | '/'
@@ -72,6 +81,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/gioca'
     | '/_authenticated/missioni'
+    | '/_authenticated/shop'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -117,17 +127,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMissioniRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/shop': {
+      id: '/_authenticated/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof AuthenticatedShopRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedGiocaRoute: typeof AuthenticatedGiocaRoute
   AuthenticatedMissioniRoute: typeof AuthenticatedMissioniRoute
+  AuthenticatedShopRoute: typeof AuthenticatedShopRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedGiocaRoute: AuthenticatedGiocaRoute,
   AuthenticatedMissioniRoute: AuthenticatedMissioniRoute,
+  AuthenticatedShopRoute: AuthenticatedShopRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
