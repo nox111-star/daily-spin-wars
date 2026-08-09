@@ -10,9 +10,9 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Accedi a Bubble Brawl — Quiz a squadre" },
-      { name: "description", content: "Entra in Bubble Brawl: scegli la squadra della settimana, gioca ai quiz trabocchetto e scala la classifica." },
-      { property: "og:title", content: "Accedi a Bubble Brawl" },
+      { title: "Accedi a Quizzly Squad — Quiz a squadre" },
+      { name: "description", content: "Entra in Quizzly Squad: scegli la squadra della settimana, gioca ai quiz trabocchetto e scala la classifica." },
+      { property: "og:title", content: "Accedi a Quizzly Squad" },
       { property: "og:description", content: "Crea il tuo profilo e unisciti alla sfida settimanale a squadre." },
     ],
   }),
@@ -69,7 +69,7 @@ function AuthPage() {
       <div className="w-full max-w-md pop-card p-6 sm:p-8">
         <div className="mb-6 text-center">
           <div className="text-5xl">🫧</div>
-          <h1 className="mt-2 font-display text-3xl font-extrabold text-gradient-pop">Bubble Brawl</h1>
+          <h1 className="mt-2 font-display text-3xl font-extrabold text-gradient-pop">Quizzly Squad</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {mode === "signup" ? "Crea il tuo profilo e scendi in campo" : "Bentornato, la squadra ti aspetta"}
           </p>

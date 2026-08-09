@@ -11,9 +11,9 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/_authenticated/shop")({
   head: () => ({
     meta: [
-      { title: "Shop — Bubble Brawl" },
+      { title: "Shop — Quizzly Squad" },
       { name: "description", content: "Acquista cornici, titoli e avatar con i crediti guadagnati oppure sbloccali guardando un video." },
-      { property: "og:title", content: "Shop di Bubble Brawl" },
+      { property: "og:title", content: "Shop di Quizzly Squad" },
       { property: "og:description", content: "Cornici, titoli e avatar per personalizzare il tuo profilo giocatore." },
     ],
   }),

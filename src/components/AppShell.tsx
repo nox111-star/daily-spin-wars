@@ -41,7 +41,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
             <div className="min-w-0">
               <p className="truncate font-display text-lg font-extrabold leading-none text-gradient-pop">
-                Bubble Brawl
+                Quizzly Squad
               </p>
               {state && (
                 <p className="truncate text-xs text-muted-foreground">

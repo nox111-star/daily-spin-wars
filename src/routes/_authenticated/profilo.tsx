@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/_authenticated/profilo")({
   head: () => ({
     meta: [
-      { title: "Profilo e Collezione — Bubble Brawl" },
+      { title: "Profilo e Collezione — Quizzly Squad" },
       { name: "description", content: "La tua collezione personale: avatar, cornici e titoli ottenuti da missioni, shop e premi settimanali." },
-      { property: "og:title", content: "Profilo di Bubble Brawl" },
+      { property: "og:title", content: "Profilo di Quizzly Squad" },
       { property: "og:description", content: "Personalizza avatar, cornice e titolo con i premi che hai conquistato." },
     ],
   }),

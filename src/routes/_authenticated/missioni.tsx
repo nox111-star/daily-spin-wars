@@ -12,9 +12,9 @@ import { Progress } from "@/components/ui/progress";
 export const Route = createFileRoute("/_authenticated/missioni")({
   head: () => ({
     meta: [
-      { title: "Missioni — Bubble Brawl" },
+      { title: "Missioni — Quizzly Squad" },
       { name: "description", content: "Completa obiettivi di gioco e sblocca avatar, cornici e titoli per la tua collezione personale." },
-      { property: "og:title", content: "Missioni di Bubble Brawl" },
+      { property: "og:title", content: "Missioni di Quizzly Squad" },
       { property: "og:description", content: "Obiettivi, ricompense e sblocchi per personalizzare il tuo profilo." },
     ],
   }),

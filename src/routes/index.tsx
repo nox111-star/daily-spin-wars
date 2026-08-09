@@ -8,13 +8,13 @@ import { Sun, Moon } from "lucide-react";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Bubble Brawl — Quiz a squadre, ogni settimana" },
+      { title: "Quizzly Squad — Quiz a squadre, ogni settimana" },
       {
         name: "description",
         content:
           "Due squadre, una settimana, quiz trabocchetto e premi. Ticket, ruote e classifiche sincronizzati col server: si vince col cervello, non con l'orologio.",
       },
-      { property: "og:title", content: "Bubble Brawl — Quiz a squadre" },
+      { property: "og:title", content: "Quizzly Squad — Quiz a squadre" },
       { property: "og:description", content: "Scegli la squadra, rispondi ai quiz e conquista i premi settimanali." },
     ],
   }),
@@ -41,7 +41,7 @@ function Landing() {
   return (
     <div className="min-h-screen">
       <header className="mx-auto flex max-w-5xl items-center justify-between px-4 py-5">
-        <span className="font-display text-xl font-extrabold text-gradient-pop">🫧 Bubble Brawl</span>
+        <span className="font-display text-xl font-extrabold text-gradient-pop">🧠 Quizzly Squad</span>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" onClick={toggle} aria-label="Cambia tema">
             {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
