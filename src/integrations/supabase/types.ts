@@ -14,6 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
+      ad_tokens: {
+        Row: {
+          consumed: boolean
+          created_at: string
+          id: string
+          purpose: string
+          user_id: string
+          verified: boolean
+        }
+        Insert: {
+          consumed?: boolean
+          created_at?: string
+          id?: string
+          purpose: string
+          user_id: string
+          verified?: boolean
+        }
+        Update: {
+          consumed?: boolean
+          created_at?: string
+          id?: string
+          purpose?: string
+          user_id?: string
+          verified?: boolean
+        }
+        Relationships: []
+      }
+      audit_log: {
+        Row: {
+          action: string
+          created_at: string
+          detail: Json | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          detail?: Json | null
+          id?: number
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          detail?: Json | null
+          id?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      chat_presets: {
+        Row: {
+          active: boolean
+          id: string
+          kind: string
+          label: string
+          sort: number
+        }
+        Insert: {
+          active?: boolean
+          id: string
+          kind: string
+          label: string
+          sort?: number
+        }
+        Update: {
+          active?: boolean
+          id?: string
+          kind?: string
+          label?: string
+          sort?: number
+        }
+        Relationships: []
+      }
       collection: {
         Row: {
           created_at: string
@@ -44,11 +119,31 @@ export type Database = {
         }
         Relationships: []
       }
+      game_config: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string
           created_at: string
           id: string
+          kind: string
+          preset_id: string | null
           team: string | null
           user_id: string
         }
@@ -56,6 +151,8 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          kind?: string
+          preset_id?: string | null
           team?: string | null
           user_id: string
         }
@@ -63,6 +160,8 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          kind?: string
+          preset_id?: string | null
           team?: string | null
           user_id?: string
         }
@@ -106,19 +205,27 @@ export type Database = {
       }
       player_state: {
         Row: {
+          base_left: number
+          bonus_left: number
           created_at: string
           emergency_count: number
           emergency_date: string | null
           last_ticket_at: string
           messages_sent: number
+          pending_difficulty: string | null
           pending_quiz: number | null
           quiz_answered: number
           quiz_correct: number
+          quiz_index: number
           team: string | null
+          team_locked: boolean
+          team_proposal: string | null
           team_week: string | null
+          ticket_date: string | null
           tickets: number
           total_points: number
           user_id: string
+          videos_used: number
           week_points: number
           week_ref: string | null
           wheel_extra_date: string | null
@@ -126,19 +233,27 @@ export type Database = {
           wheel_spins: number
         }
         Insert: {
+          base_left?: number
+          bonus_left?: number
           created_at?: string
           emergency_count?: number
           emergency_date?: string | null
           last_ticket_at?: string
           messages_sent?: number
+          pending_difficulty?: string | null
           pending_quiz?: number | null
           quiz_answered?: number
           quiz_correct?: number
+          quiz_index?: number
           team?: string | null
+          team_locked?: boolean
+          team_proposal?: string | null
           team_week?: string | null
+          ticket_date?: string | null
           tickets?: number
           total_points?: number
           user_id: string
+          videos_used?: number
           week_points?: number
           week_ref?: string | null
           wheel_extra_date?: string | null
@@ -146,19 +261,27 @@ export type Database = {
           wheel_spins?: number
         }
         Update: {
+          base_left?: number
+          bonus_left?: number
           created_at?: string
           emergency_count?: number
           emergency_date?: string | null
           last_ticket_at?: string
           messages_sent?: number
+          pending_difficulty?: string | null
           pending_quiz?: number | null
           quiz_answered?: number
           quiz_correct?: number
+          quiz_index?: number
           team?: string | null
+          team_locked?: boolean
+          team_proposal?: string | null
           team_week?: string | null
+          ticket_date?: string | null
           tickets?: number
           total_points?: number
           user_id?: string
+          videos_used?: number
           week_points?: number
           week_ref?: string | null
           wheel_extra_date?: string | null
@@ -174,6 +297,7 @@ export type Database = {
           credits: number
           frame: string
           id: string
+          last_seen: string
           title: string
           username: string
         }
@@ -183,6 +307,7 @@ export type Database = {
           credits?: number
           frame?: string
           id: string
+          last_seen?: string
           title?: string
           username: string
         }
@@ -192,86 +317,189 @@ export type Database = {
           credits?: number
           frame?: string
           id?: string
+          last_seen?: string
           title?: string
           username?: string
         }
         Relationships: []
       }
+      quiz_history: {
+        Row: {
+          quiz_id: number
+          seen_at: string
+          user_id: string
+        }
+        Insert: {
+          quiz_id: number
+          seen_at?: string
+          user_id: string
+        }
+        Update: {
+          quiz_id?: number
+          seen_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       quizzes: {
         Row: {
+          active: boolean
           correct: number
+          credits: number | null
+          difficulty: string
           id: number
           options: Json
+          points: number | null
           question: string
           quip: string
         }
         Insert: {
+          active?: boolean
           correct: number
+          credits?: number | null
+          difficulty?: string
           id?: number
           options: Json
+          points?: number | null
           question: string
           quip: string
         }
         Update: {
+          active?: boolean
           correct?: number
+          credits?: number | null
+          difficulty?: string
           id?: number
           options?: Json
+          points?: number | null
           question?: string
           quip?: string
         }
         Relationships: []
       }
+      rate_limits: {
+        Row: {
+          action: string
+          created_at: string
+          id: number
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: number
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       shop_items: {
         Row: {
+          active: boolean
           id: string
           kind: string
           name: string
           price: number
           sort: number
           value: string
+          video_price: number
         }
         Insert: {
+          active?: boolean
           id: string
           kind: string
           name: string
           price: number
           sort?: number
           value: string
+          video_price?: number
         }
         Update: {
+          active?: boolean
           id?: string
           kind?: string
           name?: string
           price?: number
           sort?: number
           value?: string
+          video_price?: number
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
         }
         Relationships: []
       }
       weeks: {
         Row: {
+          ends_at: string | null
           prize_champion: string
           prize_team: string
           settled: boolean
+          starts_at: string | null
           team_a: string
           team_b: string
           week_start: string
         }
         Insert: {
+          ends_at?: string | null
           prize_champion: string
           prize_team: string
           settled?: boolean
+          starts_at?: string | null
           team_a: string
           team_b: string
           week_start: string
         }
         Update: {
+          ends_at?: string | null
           prize_champion?: string
           prize_team?: string
           settled?: boolean
+          starts_at?: string | null
           team_a?: string
           team_b?: string
           week_start?: string
+        }
+        Relationships: []
+      }
+      wheel_days: {
+        Row: {
+          created_at: string
+          day: string
+          prizes: Json
+        }
+        Insert: {
+          created_at?: string
+          day: string
+          prizes: Json
+        }
+        Update: {
+          created_at?: string
+          day?: string
+          prizes?: Json
         }
         Relationships: []
       }
@@ -280,20 +508,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      answer_quiz: { Args: { p_choice: number; p_id: number }; Returns: Json }
+      audit: {
+        Args: { p_action: string; p_detail: Json; uid: string }
+        Returns: undefined
+      }
       bootstrap_player: { Args: { p_username: string }; Returns: undefined }
-      buy_item: { Args: { p_id: string; p_with_ad: boolean }; Returns: Json }
-      choose_team: { Args: { p_team: string }; Returns: Json }
       claim_mission: { Args: { p_id: string }; Returns: Json }
+      consume_ad_token: {
+        Args: { p_purpose: string; p_token: string; uid: string }
+        Returns: undefined
+      }
       current_week_start: { Args: never; Returns: string }
-      draw_quiz: { Args: never; Returns: Json }
-      emergency_tickets: { Args: { p_mode: string }; Returns: Json }
       ensure_week: {
         Args: never
         Returns: {
+          ends_at: string | null
           prize_champion: string
           prize_team: string
           settled: boolean
+          starts_at: string | null
           team_a: string
           team_b: string
           week_start: string
@@ -305,6 +538,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      ensure_wheel_schedule: { Args: never; Returns: undefined }
       equip_item: { Args: { p_type: string; p_value: string }; Returns: Json }
       get_state: { Args: never; Returns: Json }
       grant_item: {
@@ -317,28 +551,50 @@ export type Database = {
         }
         Returns: undefined
       }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      issue_ad_token: { Args: { p_purpose: string }; Returns: string }
       leaderboard: { Args: never; Returns: Json }
       list_missions: { Args: never; Returns: Json }
-      send_message: { Args: { p_content: string }; Returns: Json }
-      spin_morning_wheel: { Args: { p_extra: boolean }; Returns: Json }
-      spin_team_wheel: { Args: never; Returns: Json }
-      switch_team_after_ad: { Args: never; Returns: Json }
+      rate_guard: {
+        Args: {
+          p_action: string
+          p_max: number
+          p_seconds: number
+          uid: string
+        }
+        Returns: undefined
+      }
+      require_admin: { Args: never; Returns: string }
       sync_player: {
         Args: { uid: string }
         Returns: {
+          base_left: number
+          bonus_left: number
           created_at: string
           emergency_count: number
           emergency_date: string | null
           last_ticket_at: string
           messages_sent: number
+          pending_difficulty: string | null
           pending_quiz: number | null
           quiz_answered: number
           quiz_correct: number
+          quiz_index: number
           team: string | null
+          team_locked: boolean
+          team_proposal: string | null
           team_week: string | null
+          ticket_date: string | null
           tickets: number
           total_points: number
           user_id: string
+          videos_used: number
           week_points: number
           week_ref: string | null
           wheel_extra_date: string | null
@@ -354,7 +610,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -481,6 +737,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
