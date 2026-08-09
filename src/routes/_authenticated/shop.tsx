@@ -31,14 +31,19 @@ function ShopPage() {
   const has = (kind: string, value: string) =>
     (owned ?? []).some((o) => o.item_type === kind && o.item_value === value);
 
-  async function buy(id: string, withAd: boolean) {
+  async function buy(id: string, videos: number | null) {
     setBusy(id);
     try {
-      if (withAd) {
-        const seen = await playAd();
-        if (!seen) throw new Error("Video interrotto: acquisto annullato");
+      let tokens: string[] | null = null;
+      if (videos) {
+        tokens = [];
+        for (let i = 0; i < videos; i++) {
+          const token = await playAd(`shop:${id}`);
+          if (!token) throw new Error("Video interrotto: sblocco annullato");
+          tokens.push(token);
+        }
       }
-      await api.buyItem(id, withAd);
+      await api.buyItem(id, tokens);
       toast.success("Aggiunto alla tua collezione!");
       await queryClient.invalidateQueries();
     } catch (err) {

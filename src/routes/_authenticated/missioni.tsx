@@ -30,8 +30,8 @@ function MissionsPage() {
   async function unlock(id: string) {
     setBusy(id);
     try {
-      const seen = await playAd();
-      if (!seen) throw new Error("Video interrotto: premio non sbloccato");
+      const token = await playAd(`mission:${id}`);
+      if (!token) throw new Error("Video interrotto: premio non sbloccato");
       const r = await api.claimMission(id);
       toast.success(`Sbloccato: ${r.reward}`);
       await queryClient.invalidateQueries();
