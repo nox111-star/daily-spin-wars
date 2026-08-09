@@ -14,9 +14,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 export const Route = createFileRoute("/_authenticated/gioca")({
   head: () => ({
     meta: [
-      { title: "Home — Bubble Brawl" },
+      { title: "Home — Quizzly Squad" },
       { name: "description", content: "Barra squadre in tempo reale, ticket, ruota del mattino, quiz trabocchetto e vetrina premi settimanali." },
-      { property: "og:title", content: "Bubble Brawl — la sfida settimanale a squadre" },
+      { property: "og:title", content: "Quizzly Squad — la sfida settimanale a squadre" },
       { property: "og:description", content: "Gioca ai quiz, guadagna punti e porta la tua squadra alla vittoria." },
     ],
   }),

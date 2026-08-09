@@ -12,9 +12,9 @@ import { Input } from "@/components/ui/input";
 export const Route = createFileRoute("/_authenticated/chat")({
   head: () => ({
     meta: [
-      { title: "Chat — Bubble Brawl" },
+      { title: "Chat — Quizzly Squad" },
       { name: "description", content: "Chat in tempo reale con tag squadra e avatar: sfottò leggeri, zero volgarità." },
-      { property: "og:title", content: "Chat di Bubble Brawl" },
+      { property: "og:title", content: "Chat di Quizzly Squad" },
       { property: "og:description", content: "Parla con la tua squadra e sfida gli avversari a colpi di battute." },
     ],
   }),

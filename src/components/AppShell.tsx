@@ -37,11 +37,11 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="mx-auto grid max-w-5xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3">
           <div className="flex min-w-0 items-center gap-3">
             <Link to="/gioca" className="shrink-0 text-2xl">
-              🫧
+              🧠
             </Link>
             <div className="min-w-0">
               <p className="truncate font-display text-lg font-extrabold leading-none text-gradient-pop">
-                Bubble Brawl
+                Quizzly Squad
               </p>
               {state && (
                 <p className="truncate text-xs text-muted-foreground">
