@@ -95,13 +95,18 @@ function ShopPage() {
                     size="sm"
                     className="gradient-pop font-bold"
                     disabled={busy === item.id}
-                    onClick={() => buy(item.id, false)}
+                    onClick={() => buy(item.id, null)}
                   >
                     <Coins className="mr-1.5 h-4 w-4" /> {item.price}
                   </Button>
-                  <Button size="sm" variant="secondary" disabled={busy === item.id} onClick={() => buy(item.id, true)}>
-                    <Video className="mr-1.5 h-4 w-4" /> Video
-                  </Button>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    disabled={busy === item.id}
+                    onClick={() => buy(item.id, item.video_price)}
+                  >
+                    <Video className="mr-1.5 h-4 w-4" /> {item.video_price} video
+                  </Button>upd
                 </div>
               )}
             </article>
