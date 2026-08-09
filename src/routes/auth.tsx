@@ -46,8 +46,8 @@ function AuthPage() {
         });
         if (error) throw error;
         if (!data.session) {
-          toast.success("Controlla la tua email per confermare l'account!");
-          return;
+          const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+          if (signInError) throw signInError;
         }
         await api.bootstrap(username);
       } else {
@@ -68,7 +68,7 @@ function AuthPage() {
     <div className="flex min-h-screen items-center justify-center px-4 py-10">
       <div className="w-full max-w-md pop-card p-6 sm:p-8">
         <div className="mb-6 text-center">
-          <div className="text-5xl">🫧</div>
+          <div className="text-5xl">🧠</div>
           <h1 className="mt-2 font-display text-3xl font-extrabold text-gradient-pop">Quizzly Squad</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {mode === "signup" ? "Crea il tuo profilo e scendi in campo" : "Bentornato, la squadra ti aspetta"}
