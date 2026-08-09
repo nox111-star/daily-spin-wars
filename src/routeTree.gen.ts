@@ -17,6 +17,7 @@ import { Route as AuthenticatedGiocaRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedMissioniRouteImport } from './routes/_authenticated/missioni'
 import { Route as AuthenticatedProfiloRouteImport } from './routes/_authenticated/profilo'
 import { Route as AuthenticatedShopRouteImport } from './routes/_authenticated/shop'
+import { Route as ApiPublicHooksAdRewardRouteImport } from './routes/api/public/hooks/ad-reward'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -57,6 +58,11 @@ const AuthenticatedShopRoute = AuthenticatedShopRouteImport.update({
   path: '/shop',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicHooksAdRewardRoute = ApiPublicHooksAdRewardRouteImport.update({
+  id: '/api/public/hooks/ad-reward',
+  path: '/api/public/hooks/ad-reward',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/missioni': typeof AuthenticatedMissioniRoute
   '/profilo': typeof AuthenticatedProfiloRoute
   '/shop': typeof AuthenticatedShopRoute
+  '/api/public/hooks/ad-reward': typeof ApiPublicHooksAdRewardRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/missioni': typeof AuthenticatedMissioniRoute
   '/profilo': typeof AuthenticatedProfiloRoute
   '/shop': typeof AuthenticatedShopRoute
+  '/api/public/hooks/ad-reward': typeof ApiPublicHooksAdRewardRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -86,13 +94,29 @@ export interface FileRoutesById {
   '/_authenticated/missioni': typeof AuthenticatedMissioniRoute
   '/_authenticated/profilo': typeof AuthenticatedProfiloRoute
   '/_authenticated/shop': typeof AuthenticatedShopRoute
+  '/api/public/hooks/ad-reward': typeof ApiPublicHooksAdRewardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/chat' | '/gioca' | '/missioni' | '/profilo' | '/shop'
+    | '/'
+    | '/auth'
+    | '/chat'
+    | '/gioca'
+    | '/missioni'
+    | '/profilo'
+    | '/shop'
+    | '/api/public/hooks/ad-reward'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/chat' | '/gioca' | '/missioni' | '/profilo' | '/shop'
+  to:
+    | '/'
+    | '/auth'
+    | '/chat'
+    | '/gioca'
+    | '/missioni'
+    | '/profilo'
+    | '/shop'
+    | '/api/public/hooks/ad-reward'
   id:
     | '__root__'
     | '/'
@@ -103,12 +127,14 @@ export interface FileRouteTypes {
     | '/_authenticated/missioni'
     | '/_authenticated/profilo'
     | '/_authenticated/shop'
+    | '/api/public/hooks/ad-reward'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiPublicHooksAdRewardRoute: typeof ApiPublicHooksAdRewardRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -169,6 +195,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShopRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/hooks/ad-reward': {
+      id: '/api/public/hooks/ad-reward'
+      path: '/api/public/hooks/ad-reward'
+      fullPath: '/api/public/hooks/ad-reward'
+      preLoaderRoute: typeof ApiPublicHooksAdRewardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -195,17 +228,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiPublicHooksAdRewardRoute: ApiPublicHooksAdRewardRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

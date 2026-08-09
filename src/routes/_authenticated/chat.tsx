@@ -2,12 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Send } from "lucide-react";
 import { AppShell, useGameState } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { api, frameClass } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 export const Route = createFileRoute("/_authenticated/chat")({
   head: () => ({
@@ -24,11 +22,11 @@ export const Route = createFileRoute("/_authenticated/chat")({
 function ChatPage() {
   const { data: state } = useGameState();
   const queryClient = useQueryClient();
-  const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const { data: messages } = useQuery({ queryKey: ["messages"], queryFn: api.messages });
+  const { data: presets } = useQuery({ queryKey: ["presets"], queryFn: api.presets });
 
   const authorIds = useMemo(() => [...new Set((messages ?? []).map((m) => m.user_id))], [messages]);
   const { data: authors } = useQuery({
@@ -53,13 +51,10 @@ function ChatPage() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  async function send(e: React.FormEvent) {
-    e.preventDefault();
-    if (!text.trim()) return;
+  async function send(presetId: string) {
     setSending(true);
     try {
-      await api.sendMessage(text);
-      setText("");
+      await api.sendMessage(presetId);
       await queryClient.invalidateQueries();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Messaggio non inviato");
@@ -117,17 +112,42 @@ function ChatPage() {
           )}
           <div ref={bottomRef} />
         </div>
-        <form onSubmit={send} className="flex gap-2 border-t border-border p-3">
-          <Input
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            maxLength={300}
-            placeholder="Scrivi qualcosa di simpatico…"
-          />
-          <Button type="submit" size="icon" className="shrink-0 gradient-pop" disabled={sending}>
-            <Send className="h-4 w-4" />
-          </Button>
-        </form>
+        <div className="space-y-2 border-t border-border p-3">
+          <div className="flex flex-wrap gap-1.5">
+            {(presets ?? [])
+              .filter((p) => p.kind === "sticker")
+              .map((p) => (
+                <Button
+                  key={p.id}
+                  type="button"
+                  size="sm"
+                  variant="secondary"
+                  className="h-9 w-9 p-0 text-lg"
+                  disabled={sending}
+                  onClick={() => send(p.id)}
+                >
+                  {p.label}
+                </Button>
+              ))}
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {(presets ?? [])
+              .filter((p) => p.kind === "phrase")
+              .map((p) => (
+                <Button
+                  key={p.id}
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-auto whitespace-normal py-1.5 text-left text-xs"
+                  disabled={sending}
+                  onClick={() => send(p.id)}
+                >
+                  {p.label}
+                </Button>
+              ))}
+          </div>
+        </div>
       </div>
     </AppShell>
   );
