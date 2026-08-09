@@ -22,11 +22,11 @@ export const Route = createFileRoute("/_authenticated/chat")({
 function ChatPage() {
   const { data: state } = useGameState();
   const queryClient = useQueryClient();
-  const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const { data: messages } = useQuery({ queryKey: ["messages"], queryFn: api.messages });
+  const { data: presets } = useQuery({ queryKey: ["presets"], queryFn: api.presets });
 
   const authorIds = useMemo(() => [...new Set((messages ?? []).map((m) => m.user_id))], [messages]);
   const { data: authors } = useQuery({
