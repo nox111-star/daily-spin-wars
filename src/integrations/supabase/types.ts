@@ -508,17 +508,110 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_team: { Args: never; Returns: Json }
+      admin_bulk_quiz: { Args: { p_items: Json }; Returns: Json }
+      admin_clear_chat: { Args: { p_hours: number }; Returns: Json }
+      admin_delete_quiz: { Args: { p_id: number }; Returns: Json }
+      admin_list_quizzes: { Args: never; Returns: Json }
+      admin_overview: { Args: never; Returns: Json }
+      admin_set_config: {
+        Args: { p_key: string; p_value: Json }
+        Returns: Json
+      }
+      admin_set_week: {
+        Args: {
+          p_ends_at: string
+          p_prize_champion: string
+          p_prize_team: string
+          p_starts_at: string
+          p_team_a: string
+          p_team_b: string
+          p_week_start: string
+        }
+        Returns: Json
+      }
+      admin_set_wheel_day: {
+        Args: { p_day: string; p_prizes: Json }
+        Returns: Json
+      }
+      admin_settle_week: { Args: { p_week: string }; Returns: Json }
+      admin_upsert_preset: {
+        Args: {
+          p_active: boolean
+          p_id: string
+          p_kind: string
+          p_label: string
+          p_sort: number
+        }
+        Returns: Json
+      }
+      admin_upsert_shop_item: {
+        Args: {
+          p_active: boolean
+          p_id: string
+          p_kind: string
+          p_name: string
+          p_price: number
+          p_sort: number
+          p_value: string
+          p_video_price: number
+        }
+        Returns: Json
+      }
+      answer_quiz: { Args: { p_choice: number; p_id: number }; Returns: Json }
       audit: {
         Args: { p_action: string; p_detail: Json; uid: string }
         Returns: undefined
       }
       bootstrap_player: { Args: { p_username: string }; Returns: undefined }
+      buy_item: { Args: { p_id: string; p_tokens: string[] }; Returns: Json }
+      can_join: { Args: { p_team: string; ws: string }; Returns: boolean }
+      choose_team: { Args: { p_team: string }; Returns: Json }
+      claim_ad_ticket: { Args: { p_token: string }; Returns: Json }
       claim_mission: { Args: { p_id: string }; Returns: Json }
       consume_ad_token: {
         Args: { p_purpose: string; p_token: string; uid: string }
         Returns: undefined
       }
       current_week_start: { Args: never; Returns: string }
+      draw_quiz: { Args: never; Returns: Json }
+      ensure_proposal: {
+        Args: { uid: string }
+        Returns: {
+          base_left: number
+          bonus_left: number
+          created_at: string
+          emergency_count: number
+          emergency_date: string | null
+          last_ticket_at: string
+          messages_sent: number
+          pending_difficulty: string | null
+          pending_quiz: number | null
+          quiz_answered: number
+          quiz_correct: number
+          quiz_index: number
+          team: string | null
+          team_locked: boolean
+          team_proposal: string | null
+          team_week: string | null
+          ticket_date: string | null
+          tickets: number
+          total_points: number
+          user_id: string
+          videos_used: number
+          week_points: number
+          week_ref: string | null
+          wheel_extra_date: string | null
+          wheel_free_date: string | null
+          wheel_spins: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "player_state"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       ensure_week: {
         Args: never
         Returns: {
@@ -571,6 +664,13 @@ export type Database = {
         Returns: undefined
       }
       require_admin: { Args: never; Returns: string }
+      send_message: { Args: { p_preset: string }; Returns: Json }
+      settle_week: { Args: { p_week: string }; Returns: Json }
+      spin_morning_wheel: {
+        Args: { p_extra: boolean; p_token: string }
+        Returns: Json
+      }
+      swap_team: { Args: { p_token: string }; Returns: Json }
       sync_player: {
         Args: { uid: string }
         Returns: {
@@ -607,6 +707,13 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      team_counts: {
+        Args: { ws: string }
+        Returns: {
+          a: number
+          b: number
+        }[]
       }
     }
     Enums: {
