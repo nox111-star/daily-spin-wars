@@ -53,13 +53,10 @@ function ChatPage() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  async function send(e: React.FormEvent) {
-    e.preventDefault();
-    if (!text.trim()) return;
+  async function send(presetId: string) {
     setSending(true);
     try {
-      await api.sendMessage(text);
-      setText("");
+      await api.sendMessage(presetId);
       await queryClient.invalidateQueries();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Messaggio non inviato");

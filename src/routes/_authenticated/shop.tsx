@@ -106,7 +106,7 @@ function ShopPage() {
                     onClick={() => buy(item.id, item.video_price)}
                   >
                     <Video className="mr-1.5 h-4 w-4" /> {item.video_price} video
-                  </Button>upd
+                  </Button>
                 </div>
               )}
             </article>
