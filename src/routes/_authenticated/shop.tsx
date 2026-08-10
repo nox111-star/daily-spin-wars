@@ -89,26 +89,32 @@ function ShopPage() {
                 <span className="flex items-center gap-1 text-sm font-bold text-success">
                   <Check className="h-4 w-4" /> Nella collezione
                 </span>
-              ) : (
-                <div className="flex flex-wrap gap-2">
+              ) : item.unlock_mode === "credits" ? (
+                <div className="flex flex-wrap items-center gap-2">
                   <Button
                     size="sm"
                     className="gradient-pop font-bold"
                     disabled={busy === item.id}
                     onClick={() => buy(item.id, null)}
                   >
-                    <Coins className="mr-1.5 h-4 w-4" /> {item.price}
+                    <Coins className="mr-1.5 h-4 w-4" /> Sblocca con {item.price} crediti
                   </Button>
+                  <span className="text-xs text-muted-foreground">Solo crediti</span>
+                </div>
+              ) : (
+                <div className="flex flex-wrap items-center gap-2">
                   <Button
                     size="sm"
                     variant="secondary"
                     disabled={busy === item.id}
                     onClick={() => buy(item.id, item.video_price)}
                   >
-                    <Video className="mr-1.5 h-4 w-4" /> {item.video_price} video
+                    <Video className="mr-1.5 h-4 w-4" /> Guarda {item.video_price} video
                   </Button>
+                  <span className="text-xs text-muted-foreground">Solo video</span>
                 </div>
               )}
+
             </article>
           );
         })}

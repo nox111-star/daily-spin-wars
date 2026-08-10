@@ -266,6 +266,7 @@ function WeekConfig({ data, onDone }: { data: AdminOverview; onDone: () => void 
     team_b: w?.team_b ?? "",
     prize_champion: w?.prize_champion ?? "",
     prize_team: w?.prize_team ?? "",
+    champion_frame: w?.champion_frame ?? "crown",
     starts_at: toLocalInput(w?.starts_at),
     ends_at: toLocalInput(w?.ends_at),
   });
@@ -326,6 +327,7 @@ function WeekConfig({ data, onDone }: { data: AdminOverview; onDone: () => void 
         {field("team_b", "Nome Squadra B")}
         {field("prize_champion", "Premio campione")}
         {field("prize_team", "Premio squadra vincente")}
+        {field("champion_frame", "Cornice corona campione (es. crown, gold, aurora)")}
         {field("starts_at", "Apertura sfida", "datetime-local")}
         {field("ends_at", "Chiusura sfida", "datetime-local")}
       </div>
