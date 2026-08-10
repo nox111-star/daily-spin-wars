@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Home, Target, ShoppingBag, MessageCircle, Sun, Moon, LogOut, Ticket, Coins } from "lucide-react";
+import { Home, Target, ShoppingBag, MessageCircle, Sun, Moon, LogOut, Ticket, Coins, Shield } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +13,7 @@ const NAV = [
   { to: "/shop", label: "Shop", icon: ShoppingBag },
   { to: "/chat", label: "Chat", icon: MessageCircle },
 ] as const;
+
 
 export function useGameState() {
   return useQuery<GameState>({ queryKey: ["state"], queryFn: api.state, refetchInterval: 30000 });
@@ -89,13 +90,23 @@ export function AppShell({ children }: { children: ReactNode }) {
               {label}
             </Link>
           ))}
+          {state?.is_admin && (
+            <Link
+              to="/admin"
+              className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:bg-muted data-[status=active]:gradient-pop data-[status=active]:text-primary-foreground"
+            >
+              <Shield className="h-4 w-4" />
+              Admin
+            </Link>
+          )}
         </nav>
+
       </header>
 
       <main className="mx-auto w-full max-w-5xl px-4 py-5">{children}</main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-border/60 bg-background/90 backdrop-blur-xl md:hidden">
-        <div className="mx-auto grid max-w-lg grid-cols-4">
+        <div className={`mx-auto grid max-w-lg ${state?.is_admin ? "grid-cols-5" : "grid-cols-4"}`}>
           {NAV.map(({ to, label, icon: Icon }) => (
             <Link
               key={to}
@@ -106,7 +117,17 @@ export function AppShell({ children }: { children: ReactNode }) {
               {label}
             </Link>
           ))}
+          {state?.is_admin && (
+            <Link
+              to="/admin"
+              className="flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-semibold text-muted-foreground data-[status=active]:text-primary"
+            >
+              <Shield className="h-5 w-5" />
+              Admin
+            </Link>
+          )}
         </div>
+
       </nav>
     </div>
   );
