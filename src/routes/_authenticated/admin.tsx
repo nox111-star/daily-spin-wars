@@ -327,6 +327,7 @@ function WeekConfig({ data, onDone }: { data: AdminOverview; onDone: () => void 
         {field("team_b", "Nome Squadra B")}
         {field("prize_champion", "Premio campione")}
         {field("prize_team", "Premio squadra vincente")}
+        {field("champion_frame", "Cornice corona campione (es. crown, gold, aurora)")}
         {field("starts_at", "Apertura sfida", "datetime-local")}
         {field("ends_at", "Chiusura sfida", "datetime-local")}
       </div>
