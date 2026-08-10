@@ -94,6 +94,7 @@ export type ShopItem = {
   kind: "avatar" | "frame" | "title";
   name: string;
   value: string;
+  unlock_mode: "credits" | "video";
   price: number;
   video_price: number;
   active: boolean;
