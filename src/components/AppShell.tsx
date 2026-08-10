@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Home, Target, ShoppingBag, MessageCircle, Sun, Moon, LogOut, Ticket, Coins } from "lucide-react";
+import { Home, Target, ShoppingBag, MessageCircle, Sun, Moon, LogOut, Ticket, Coins, Shield } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +13,7 @@ const NAV = [
   { to: "/shop", label: "Shop", icon: ShoppingBag },
   { to: "/chat", label: "Chat", icon: MessageCircle },
 ] as const;
+
 
 export function useGameState() {
   return useQuery<GameState>({ queryKey: ["state"], queryFn: api.state, refetchInterval: 30000 });
