@@ -143,6 +143,7 @@ export type AdminOverview = {
     team_b: string;
     prize_champion: string;
     prize_team: string;
+    champion_frame: string;
     starts_at: string | null;
     ends_at: string | null;
     settled: boolean;
