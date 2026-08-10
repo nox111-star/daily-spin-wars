@@ -266,6 +266,7 @@ function WeekConfig({ data, onDone }: { data: AdminOverview; onDone: () => void 
     team_b: w?.team_b ?? "",
     prize_champion: w?.prize_champion ?? "",
     prize_team: w?.prize_team ?? "",
+    champion_frame: w?.champion_frame ?? "crown",
     starts_at: toLocalInput(w?.starts_at),
     ends_at: toLocalInput(w?.ends_at),
   });
