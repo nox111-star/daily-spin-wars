@@ -65,6 +65,48 @@ export type Database = {
         }
         Relationships: []
       }
+      automation_settings: {
+        Row: {
+          clear_chat: boolean
+          created_at: string
+          enabled: boolean
+          id: boolean
+          last_run_date: string | null
+          last_run_detail: Json | null
+          refresh_wheel: boolean
+          run_at: string
+          season_end_dow: number
+          updated_at: string
+          wheel_template: Json
+        }
+        Insert: {
+          clear_chat?: boolean
+          created_at?: string
+          enabled?: boolean
+          id?: boolean
+          last_run_date?: string | null
+          last_run_detail?: Json | null
+          refresh_wheel?: boolean
+          run_at?: string
+          season_end_dow?: number
+          updated_at?: string
+          wheel_template?: Json
+        }
+        Update: {
+          clear_chat?: boolean
+          created_at?: string
+          enabled?: boolean
+          id?: boolean
+          last_run_date?: string | null
+          last_run_detail?: Json | null
+          refresh_wheel?: boolean
+          run_at?: string
+          season_end_dow?: number
+          updated_at?: string
+          wheel_template?: Json
+        }
+        Relationships: []
+      }
       chat_presets: {
         Row: {
           active: boolean
@@ -214,6 +256,7 @@ export type Database = {
           messages_sent: number
           pending_difficulty: string | null
           pending_quiz: number | null
+          pending_started_at: string | null
           quiz_answered: number
           quiz_correct: number
           quiz_index: number
@@ -242,6 +285,7 @@ export type Database = {
           messages_sent?: number
           pending_difficulty?: string | null
           pending_quiz?: number | null
+          pending_started_at?: string | null
           quiz_answered?: number
           quiz_correct?: number
           quiz_index?: number
@@ -270,6 +314,7 @@ export type Database = {
           messages_sent?: number
           pending_difficulty?: string | null
           pending_quiz?: number | null
+          pending_started_at?: string | null
           quiz_answered?: number
           quiz_correct?: number
           quiz_index?: number
@@ -406,6 +451,7 @@ export type Database = {
           name: string
           price: number
           sort: number
+          unlock_mode: string
           value: string
           video_price: number
         }
@@ -416,6 +462,7 @@ export type Database = {
           name: string
           price: number
           sort?: number
+          unlock_mode?: string
           value: string
           video_price?: number
         }
@@ -426,6 +473,7 @@ export type Database = {
           name?: string
           price?: number
           sort?: number
+          unlock_mode?: string
           value?: string
           video_price?: number
         }
@@ -454,6 +502,7 @@ export type Database = {
       }
       weeks: {
         Row: {
+          champion_frame: string
           ends_at: string | null
           prize_champion: string
           prize_team: string
@@ -464,6 +513,7 @@ export type Database = {
           week_start: string
         }
         Insert: {
+          champion_frame?: string
           ends_at?: string | null
           prize_champion: string
           prize_team: string
@@ -474,6 +524,7 @@ export type Database = {
           week_start: string
         }
         Update: {
+          champion_frame?: string
           ends_at?: string | null
           prize_champion?: string
           prize_team?: string
@@ -512,24 +563,52 @@ export type Database = {
       admin_bulk_quiz: { Args: { p_items: Json }; Returns: Json }
       admin_clear_chat: { Args: { p_hours: number }; Returns: Json }
       admin_delete_quiz: { Args: { p_id: number }; Returns: Json }
+      admin_delete_shop_item: { Args: { p_id: string }; Returns: Json }
+      admin_get_automation: { Args: never; Returns: Json }
       admin_list_quizzes: { Args: never; Returns: Json }
       admin_overview: { Args: never; Returns: Json }
+      admin_run_automation: { Args: never; Returns: Json }
+      admin_set_automation: {
+        Args: {
+          p_clear_chat: boolean
+          p_enabled: boolean
+          p_refresh_wheel: boolean
+          p_run_at: string
+          p_season_end_dow: number
+          p_wheel_template: Json
+        }
+        Returns: Json
+      }
       admin_set_config: {
         Args: { p_key: string; p_value: Json }
         Returns: Json
       }
-      admin_set_week: {
-        Args: {
-          p_ends_at: string
-          p_prize_champion: string
-          p_prize_team: string
-          p_starts_at: string
-          p_team_a: string
-          p_team_b: string
-          p_week_start: string
-        }
-        Returns: Json
-      }
+      admin_set_week:
+        | {
+            Args: {
+              p_ends_at: string
+              p_prize_champion: string
+              p_prize_team: string
+              p_starts_at: string
+              p_team_a: string
+              p_team_b: string
+              p_week_start: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_champion_frame?: string
+              p_ends_at: string
+              p_prize_champion: string
+              p_prize_team: string
+              p_starts_at: string
+              p_team_a: string
+              p_team_b: string
+              p_week_start: string
+            }
+            Returns: Json
+          }
       admin_set_wheel_day: {
         Args: { p_day: string; p_prizes: Json }
         Returns: Json
@@ -545,19 +624,34 @@ export type Database = {
         }
         Returns: Json
       }
-      admin_upsert_shop_item: {
-        Args: {
-          p_active: boolean
-          p_id: string
-          p_kind: string
-          p_name: string
-          p_price: number
-          p_sort: number
-          p_value: string
-          p_video_price: number
-        }
-        Returns: Json
-      }
+      admin_upsert_shop_item:
+        | {
+            Args: {
+              p_active: boolean
+              p_id: string
+              p_kind: string
+              p_name: string
+              p_price: number
+              p_sort: number
+              p_value: string
+              p_video_price: number
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_active: boolean
+              p_id: string
+              p_kind: string
+              p_name: string
+              p_price: number
+              p_sort: number
+              p_unlock_mode?: string
+              p_value: string
+              p_video_price: number
+            }
+            Returns: Json
+          }
       answer_quiz: { Args: { p_choice: number; p_id: number }; Returns: Json }
       audit: {
         Args: { p_action: string; p_detail: Json; uid: string }
@@ -587,6 +681,7 @@ export type Database = {
           messages_sent: number
           pending_difficulty: string | null
           pending_quiz: number | null
+          pending_started_at: string | null
           quiz_answered: number
           quiz_correct: number
           quiz_index: number
@@ -615,6 +710,7 @@ export type Database = {
       ensure_week: {
         Args: never
         Returns: {
+          champion_frame: string
           ends_at: string | null
           prize_champion: string
           prize_team: string
@@ -664,6 +760,7 @@ export type Database = {
         Returns: undefined
       }
       require_admin: { Args: never; Returns: string }
+      run_automation: { Args: { p_force?: boolean }; Returns: Json }
       send_message: { Args: { p_preset: string }; Returns: Json }
       settle_week: { Args: { p_week: string }; Returns: Json }
       spin_morning_wheel: {
@@ -683,6 +780,7 @@ export type Database = {
           messages_sent: number
           pending_difficulty: string | null
           pending_quiz: number | null
+          pending_started_at: string | null
           quiz_answered: number
           quiz_correct: number
           quiz_index: number
@@ -715,6 +813,7 @@ export type Database = {
           b: number
         }[]
       }
+      team_leaderboard: { Args: never; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "user"
