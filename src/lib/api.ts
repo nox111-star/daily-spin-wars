@@ -29,6 +29,7 @@ export type TeamFlow = {
 export type GameState = {
   needs_bootstrap?: boolean;
   server_now: string;
+  quiz_seconds: number;
   is_admin: boolean;
   profile: { id: string; username: string; avatar: string; frame: string; title: string; credits: number };
   tickets: number;
@@ -45,6 +46,7 @@ export type GameState = {
     team_b: string;
     prize_champion: string;
     prize_team: string;
+    champion_frame: string;
     starts_at: string | null;
     ends_at: string | null;
   };
@@ -60,6 +62,20 @@ export type GameState = {
     total_points: number;
   };
 };
+
+export type TeamStanding = { team: "A" | "B"; name: string; points: number; members: number };
+
+export type Automation = {
+  enabled: boolean;
+  run_at: string;
+  season_end_dow: number;
+  clear_chat: boolean;
+  refresh_wheel: boolean;
+  wheel_template: WheelPrize[];
+  last_run_date: string | null;
+  last_run_detail: Record<string, unknown> | null;
+};
+
 
 export type Mission = {
   id: string;
