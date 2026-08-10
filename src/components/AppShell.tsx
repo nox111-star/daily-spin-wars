@@ -90,7 +90,17 @@ export function AppShell({ children }: { children: ReactNode }) {
               {label}
             </Link>
           ))}
+          {state?.is_admin && (
+            <Link
+              to="/admin"
+              className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:bg-muted data-[status=active]:gradient-pop data-[status=active]:text-primary-foreground"
+            >
+              <Shield className="h-4 w-4" />
+              Admin
+            </Link>
+          )}
         </nav>
+
       </header>
 
       <main className="mx-auto w-full max-w-5xl px-4 py-5">{children}</main>
