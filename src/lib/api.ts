@@ -171,12 +171,18 @@ export const api = {
   spinWheel: (extra: boolean, token: string | null) =>
     rpc<{ label: string; credits: number; points: number }>("spin_morning_wheel", { p_extra: extra, p_token: token }),
 
-  drawQuiz: () => rpc<{ id: number; question: string; options: string[]; difficulty: Difficulty }>("draw_quiz"),
+  drawQuiz: () =>
+    rpc<{ id: number; question: string; options: string[]; difficulty: Difficulty; seconds_left: number }>("draw_quiz"),
   answerQuiz: (id: number, choice: number) =>
-    rpc<{ correct: boolean; answer: number; quip: string; points: number; credits: number; difficulty: Difficulty }>(
-      "answer_quiz",
-      { p_id: id, p_choice: choice },
-    ),
+    rpc<{
+      correct: boolean;
+      answer: number;
+      quip: string;
+      points: number;
+      credits: number;
+      difficulty: Difficulty;
+      expired: boolean;
+    }>("answer_quiz", { p_id: id, p_choice: choice }),
 
   missions: () => rpc<Mission[]>("list_missions"),
   claimMission: (id: string) => rpc<{ ok: boolean; reward: string }>("claim_mission", { p_id: id }),
@@ -184,6 +190,7 @@ export const api = {
   equip: (type: string, value: string) => rpc<{ ok: boolean }>("equip_item", { p_type: type, p_value: value }),
   sendMessage: (presetId: string) => rpc<{ ok: boolean }>("send_message", { p_preset: presetId }),
   leaderboard: () => rpc<LeaderRow[]>("leaderboard"),
+  teamLeaderboard: () => rpc<TeamStanding[]>("team_leaderboard"),
 
   // ---- admin ----
   adminOverview: () => rpc<AdminOverview>("admin_overview"),
@@ -193,12 +200,24 @@ export const api = {
     rpc<{ ok: boolean }>("admin_set_wheel_day", { p_day: day, p_prizes: prizes }),
   adminClearChat: (hours: number) => rpc<{ deleted: number }>("admin_clear_chat", { p_hours: hours }),
   adminSettleWeek: (week: string) => rpc<{ ok: boolean; winner?: string }>("admin_settle_week", { p_week: week }),
+  adminGetAutomation: () => rpc<Automation>("admin_get_automation"),
+  adminSetAutomation: (a: Automation) =>
+    rpc<{ ok: boolean }>("admin_set_automation", {
+      p_enabled: a.enabled,
+      p_run_at: a.run_at,
+      p_season_end_dow: a.season_end_dow,
+      p_clear_chat: a.clear_chat,
+      p_refresh_wheel: a.refresh_wheel,
+      p_wheel_template: a.wheel_template,
+    }),
+  adminRunAutomation: () => rpc<{ ok: boolean; detail?: Record<string, unknown>; reason?: string }>("admin_run_automation"),
   adminSetWeek: (w: {
     week_start: string;
     team_a: string;
     team_b: string;
     prize_champion: string;
     prize_team: string;
+    champion_frame: string;
     starts_at: string;
     ends_at: string;
   }) =>
@@ -208,6 +227,7 @@ export const api = {
       p_team_b: w.team_b,
       p_prize_champion: w.prize_champion,
       p_prize_team: w.prize_team,
+      p_champion_frame: w.champion_frame,
       p_starts_at: w.starts_at,
       p_ends_at: w.ends_at,
     }),
@@ -221,7 +241,10 @@ export const api = {
       p_video_price: i.video_price,
       p_sort: i.sort,
       p_active: i.active,
+      p_unlock_mode: i.unlock_mode,
     }),
+  adminDeleteShopItem: (id: string) => rpc<{ ok: boolean }>("admin_delete_shop_item", { p_id: id }),
+
   adminUpsertPreset: (p: ChatPreset & { active: boolean }) =>
     rpc<{ ok: boolean }>("admin_upsert_preset", {
       p_id: p.id,
