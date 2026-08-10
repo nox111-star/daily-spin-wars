@@ -106,7 +106,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <main className="mx-auto w-full max-w-5xl px-4 py-5">{children}</main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-border/60 bg-background/90 backdrop-blur-xl md:hidden">
-        <div className="mx-auto grid max-w-lg grid-cols-4">
+        <div className={`mx-auto grid max-w-lg ${state?.is_admin ? "grid-cols-5" : "grid-cols-4"}`}>
           {NAV.map(({ to, label, icon: Icon }) => (
             <Link
               key={to}
@@ -117,7 +117,17 @@ export function AppShell({ children }: { children: ReactNode }) {
               {label}
             </Link>
           ))}
+          {state?.is_admin && (
+            <Link
+              to="/admin"
+              className="flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-semibold text-muted-foreground data-[status=active]:text-primary"
+            >
+              <Shield className="h-5 w-5" />
+              Admin
+            </Link>
+          )}
         </div>
+
       </nav>
     </div>
   );
