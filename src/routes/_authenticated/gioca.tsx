@@ -1,13 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Ticket, Coins, Trophy, Users, Sparkles, RefreshCw, Video, Lock, Crown, Shield } from "lucide-react";
+import { Ticket, Coins, Trophy, Users, Sparkles, RefreshCw, Video, Lock, Crown, Shield, Timer } from "lucide-react";
 import { AppShell, useGameState } from "@/components/AppShell";
 import { useAdPlayer } from "@/components/AdPlayer";
 import { api, frameClass, difficultyLabel, difficultyTone, type Difficulty } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
+type QuizDraw = Awaited<ReturnType<typeof api.drawQuiz>>;
+type QuizResult = Awaited<ReturnType<typeof api.answerQuiz>>;
+
+
 
 export const Route = createFileRoute("/_authenticated/gioca")({
   head: () => ({
@@ -31,13 +36,55 @@ function HomePage() {
   const queryClient = useQueryClient();
   const { playAd, AdOverlay } = useAdPlayer();
   const [busy, setBusy] = useState(false);
-  const [quiz, setQuiz] = useState<{ id: number; question: string; options: string[]; difficulty: Difficulty } | null>(null);
-  const [result, setResult] = useState<{ correct: boolean; answer: number; quip: string; points: number } | null>(null);
+  const [quiz, setQuiz] = useState<QuizDraw | null>(null);
+  const [result, setResult] = useState<QuizResult | null>(null);
   const [wheelResult, setWheelResult] = useState<string | null>(null);
+  const [left, setLeft] = useState(0);
+  const answering = useRef(false);
 
   const { data: board } = useQuery({ queryKey: ["leaderboard"], queryFn: api.leaderboard, refetchInterval: 30000 });
+  const { data: teamBoard } = useQuery({
+    queryKey: ["team-leaderboard"],
+    queryFn: api.teamLeaderboard,
+    refetchInterval: 30000,
+  });
 
   const refresh = () => queryClient.invalidateQueries();
+
+  async function submitAnswer(choice: number) {
+    if (!quiz || answering.current) return;
+    answering.current = true;
+    setBusy(true);
+    try {
+      const r = await api.answerQuiz(quiz.id, choice);
+      setResult(r);
+      await refresh();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Risposta non registrata");
+      setQuiz(null);
+    } finally {
+      answering.current = false;
+      setBusy(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!quiz || result) return;
+    const total = quiz.seconds_left ?? 15;
+    setLeft(total);
+    const started = Date.now();
+    const timer = setInterval(() => {
+      const rem = Math.max(0, total - Math.floor((Date.now() - started) / 1000));
+      setLeft(rem);
+      if (rem <= 0) {
+        clearInterval(timer);
+        void submitAnswer(-1);
+      }
+    }, 250);
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quiz, result]);
+
 
   async function run(fn: () => Promise<unknown>, ok?: string) {
     setBusy(true);
@@ -189,12 +236,26 @@ function HomePage() {
             <Trophy className="h-5 w-5 text-warning" /> Vetrina Premi
           </h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            <div className="relative overflow-hidden rounded-2xl border border-warning/40 bg-gradient-to-br from-warning/20 to-transparent p-5">
-              <Crown className="absolute -right-3 -top-3 h-20 w-20 text-warning/20" />
-              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Premio Campione</p>
-              <p className="mt-1 text-lg font-extrabold">{state.week.prize_champion}</p>
-              <p className="mt-1 text-xs text-muted-foreground">Corona unica al 1° posto della classifica</p>
+            <div className="pop-card flex flex-col gap-3 border border-warning/40 bg-gradient-to-br from-warning/15 to-transparent p-4">
+              <div className="flex items-center gap-3">
+                <span
+                  className={`grid h-14 w-14 shrink-0 place-items-center rounded-full bg-muted text-2xl ${frameClass(
+                    state.week.champion_frame,
+                  )}`}
+                >
+                  👑
+                </span>
+                <div className="min-w-0">
+                  <h3 className="truncate font-extrabold">{state.week.prize_champion}</h3>
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Premio Campione · cornice</p>
+                </div>
+              </div>
+              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Crown className="h-3.5 w-3.5 text-warning" />
+                Cornice corona "{state.week.champion_frame}" al 1° posto individuale a fine stagione
+              </p>
             </div>
+
             <div className="relative overflow-hidden rounded-2xl border border-secondary/40 bg-gradient-to-br from-secondary/20 to-transparent p-5">
               <Users className="absolute -right-3 -top-3 h-20 w-20 text-secondary/20" />
               <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Premio Squadra</p>
@@ -307,8 +368,43 @@ function HomePage() {
           </Button>
         </section>
 
+        {/* CLASSIFICA SQUADRE */}
+        <section className="pop-card p-5">
+          <h2 className="mb-3 flex items-center gap-2 text-xl font-extrabold">
+            <Shield className="h-5 w-5 text-secondary" /> Classifica squadre
+          </h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {(teamBoard ?? []).map((t, i) => (
+              <div
+                key={t.team}
+                className={`rounded-2xl border p-4 ${
+                  i === 0 ? "border-warning/50 bg-warning/10" : "border-border bg-muted/40"
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="flex min-w-0 items-center gap-2 font-extrabold">
+                    {i === 0 && <Trophy className="h-4 w-4 shrink-0 text-warning" />}
+                    <span className="truncate">{t.name}</span>
+                  </span>
+                  <span className="shrink-0 font-display text-2xl font-extrabold text-gradient-pop">{t.points}</span>
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {t.members} giocatori · somma dei punti dei membri
+                </p>
+              </div>
+            ))}
+            {(teamBoard ?? []).length === 0 && (
+              <p className="text-sm text-muted-foreground">Classifica squadre non ancora disponibile.</p>
+            )}
+          </div>
+          <p className="mt-3 text-xs text-muted-foreground">
+            Il premio squadra viene assegnato alla prima in classifica solo a fine stagione.
+          </p>
+        </section>
+
         {/* CLASSIFICA */}
         <section className="pop-card p-5">
+
           <h2 className="mb-3 flex items-center gap-2 text-xl font-extrabold">
             <Coins className="h-5 w-5 text-warning" /> Classifica settimanale
           </h2>
@@ -349,19 +445,28 @@ function HomePage() {
             <DialogTitle className="text-left text-lg leading-snug">{quiz?.question}</DialogTitle>
           </DialogHeader>
           {!result ? (
-            <div className="space-y-2">
+            <div className="space-y-3">
+              <div>
+                <div className="mb-1 flex items-center justify-between text-xs font-bold">
+                  <span className="flex items-center gap-1 text-muted-foreground">
+                    <Timer className="h-3.5 w-3.5" /> Tempo
+                  </span>
+                  <span className={left <= 5 ? "text-destructive" : "text-muted-foreground"}>{left}s</span>
+                </div>
+                <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                  <div
+                    className={`h-full transition-all duration-300 ${left <= 5 ? "bg-destructive" : "gradient-pop"}`}
+                    style={{ width: `${Math.round((left / (quiz?.seconds_left || 15)) * 100)}%` }}
+                  />
+                </div>
+              </div>
               {quiz?.options.map((opt, i) => (
                 <Button
                   key={opt}
                   variant="secondary"
                   className="h-auto w-full justify-start whitespace-normal py-3 text-left"
                   disabled={busy}
-                  onClick={() =>
-                    run(async () => {
-                      const r = await api.answerQuiz(quiz.id, i);
-                      setResult(r);
-                    })
-                  }
+                  onClick={() => submitAnswer(i)}
                 >
                   {opt}
                 </Button>
@@ -369,17 +474,43 @@ function HomePage() {
             </div>
           ) : (
             <div className="space-y-3 text-center">
-              <div className="text-5xl">{result.correct ? "🎉" : "🙃"}</div>
-              <p className="font-extrabold">{result.correct ? `Esatto! +${result.points} punti` : "Ci sei cascato!"}</p>
+              <div className="animate-bounce text-5xl">{result.correct ? "🎉" : "🙃"}</div>
+              <p className="font-extrabold">
+                {result.correct ? "Esatto!" : result.expired ? "Tempo scaduto — Ci sei cascato!" : "Ci sei cascato!"}
+              </p>
+              {result.correct && (
+                <div className="flex justify-center gap-2">
+                  <span className="animate-in zoom-in inline-flex items-center gap-1 rounded-full bg-primary/15 px-3 py-1 text-sm font-extrabold text-primary">
+                    <Trophy className="h-4 w-4" /> +{result.points} punti
+                  </span>
+                  <span className="animate-in zoom-in inline-flex items-center gap-1 rounded-full bg-warning/15 px-3 py-1 text-sm font-extrabold text-warning">
+                    <Coins className="h-4 w-4" /> +{result.credits} crediti
+                  </span>
+                </div>
+              )}
               <p className="text-sm text-muted-foreground">{result.quip}</p>
-              {!result.correct && quiz && (
+              {!result.correct && quiz && result.answer >= 0 && (
                 <p className="text-sm font-semibold">Risposta giusta: {quiz.options[result.answer]}</p>
               )}
-              <Button className="w-full gradient-pop font-bold" onClick={() => setQuiz(null)}>
+              <Button
+                className="w-full gradient-pop font-bold"
+                disabled={busy}
+                onClick={() =>
+                  run(async () => {
+                    setResult(null);
+                    try {
+                      setQuiz(await api.drawQuiz());
+                    } catch {
+                      setQuiz(null);
+                    }
+                  })
+                }
+              >
                 Continua
               </Button>
             </div>
           )}
+
         </DialogContent>
       </Dialog>
 
