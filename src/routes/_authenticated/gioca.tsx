@@ -236,12 +236,26 @@ function HomePage() {
             <Trophy className="h-5 w-5 text-warning" /> Vetrina Premi
           </h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            <div className="relative overflow-hidden rounded-2xl border border-warning/40 bg-gradient-to-br from-warning/20 to-transparent p-5">
-              <Crown className="absolute -right-3 -top-3 h-20 w-20 text-warning/20" />
-              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Premio Campione</p>
-              <p className="mt-1 text-lg font-extrabold">{state.week.prize_champion}</p>
-              <p className="mt-1 text-xs text-muted-foreground">Corona unica al 1° posto della classifica</p>
+            <div className="pop-card flex flex-col gap-3 border border-warning/40 bg-gradient-to-br from-warning/15 to-transparent p-4">
+              <div className="flex items-center gap-3">
+                <span
+                  className={`grid h-14 w-14 shrink-0 place-items-center rounded-full bg-muted text-2xl ${frameClass(
+                    state.week.champion_frame,
+                  )}`}
+                >
+                  👑
+                </span>
+                <div className="min-w-0">
+                  <h3 className="truncate font-extrabold">{state.week.prize_champion}</h3>
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">Premio Campione · cornice</p>
+                </div>
+              </div>
+              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Crown className="h-3.5 w-3.5 text-warning" />
+                Cornice corona "{state.week.champion_frame}" al 1° posto individuale a fine stagione
+              </p>
             </div>
+
             <div className="relative overflow-hidden rounded-2xl border border-secondary/40 bg-gradient-to-br from-secondary/20 to-transparent p-5">
               <Users className="absolute -right-3 -top-3 h-20 w-20 text-secondary/20" />
               <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Premio Squadra</p>
