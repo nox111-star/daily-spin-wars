@@ -81,6 +81,8 @@ function AdminPage() {
               <TabsTrigger value="quiz">Quiz</TabsTrigger>
               <TabsTrigger value="wheel">Ruota 10 giorni</TabsTrigger>
               <TabsTrigger value="week">Sfida settimanale</TabsTrigger>
+              <TabsTrigger value="shop">Shop</TabsTrigger>
+              <TabsTrigger value="auto">Automazioni</TabsTrigger>
               <TabsTrigger value="chat">Chat</TabsTrigger>
               <TabsTrigger value="live">Live monitor</TabsTrigger>
             </TabsList>
