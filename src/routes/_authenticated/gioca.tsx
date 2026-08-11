@@ -368,8 +368,43 @@ function HomePage() {
           </Button>
         </section>
 
+        {/* CLASSIFICA SQUADRE */}
+        <section className="pop-card p-5">
+          <h2 className="mb-3 flex items-center gap-2 text-xl font-extrabold">
+            <Shield className="h-5 w-5 text-secondary" /> Classifica squadre
+          </h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {(teamBoard ?? []).map((t, i) => (
+              <div
+                key={t.team}
+                className={`rounded-2xl border p-4 ${
+                  i === 0 ? "border-warning/50 bg-warning/10" : "border-border bg-muted/40"
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="flex min-w-0 items-center gap-2 font-extrabold">
+                    {i === 0 && <Trophy className="h-4 w-4 shrink-0 text-warning" />}
+                    <span className="truncate">{t.name}</span>
+                  </span>
+                  <span className="shrink-0 font-display text-2xl font-extrabold text-gradient-pop">{t.points}</span>
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {t.members} giocatori · somma dei punti dei membri
+                </p>
+              </div>
+            ))}
+            {(teamBoard ?? []).length === 0 && (
+              <p className="text-sm text-muted-foreground">Classifica squadre non ancora disponibile.</p>
+            )}
+          </div>
+          <p className="mt-3 text-xs text-muted-foreground">
+            Il premio squadra viene assegnato alla prima in classifica solo a fine stagione.
+          </p>
+        </section>
+
         {/* CLASSIFICA */}
         <section className="pop-card p-5">
+
           <h2 className="mb-3 flex items-center gap-2 text-xl font-extrabold">
             <Coins className="h-5 w-5 text-warning" /> Classifica settimanale
           </h2>
