@@ -31,13 +31,55 @@ function HomePage() {
   const queryClient = useQueryClient();
   const { playAd, AdOverlay } = useAdPlayer();
   const [busy, setBusy] = useState(false);
-  const [quiz, setQuiz] = useState<{ id: number; question: string; options: string[]; difficulty: Difficulty } | null>(null);
-  const [result, setResult] = useState<{ correct: boolean; answer: number; quip: string; points: number } | null>(null);
+  const [quiz, setQuiz] = useState<QuizDraw | null>(null);
+  const [result, setResult] = useState<QuizResult | null>(null);
   const [wheelResult, setWheelResult] = useState<string | null>(null);
+  const [left, setLeft] = useState(0);
+  const answering = useRef(false);
 
   const { data: board } = useQuery({ queryKey: ["leaderboard"], queryFn: api.leaderboard, refetchInterval: 30000 });
+  const { data: teamBoard } = useQuery({
+    queryKey: ["team-leaderboard"],
+    queryFn: api.teamLeaderboard,
+    refetchInterval: 30000,
+  });
 
   const refresh = () => queryClient.invalidateQueries();
+
+  async function submitAnswer(choice: number) {
+    if (!quiz || answering.current) return;
+    answering.current = true;
+    setBusy(true);
+    try {
+      const r = await api.answerQuiz(quiz.id, choice);
+      setResult(r);
+      await refresh();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Risposta non registrata");
+      setQuiz(null);
+    } finally {
+      answering.current = false;
+      setBusy(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!quiz || result) return;
+    const total = quiz.seconds_left ?? 15;
+    setLeft(total);
+    const started = Date.now();
+    const timer = setInterval(() => {
+      const rem = Math.max(0, total - Math.floor((Date.now() - started) / 1000));
+      setLeft(rem);
+      if (rem <= 0) {
+        clearInterval(timer);
+        void submitAnswer(-1);
+      }
+    }, 250);
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quiz, result]);
+
 
   async function run(fn: () => Promise<unknown>, ok?: string) {
     setBusy(true);
