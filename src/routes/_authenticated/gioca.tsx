@@ -445,19 +445,28 @@ function HomePage() {
             <DialogTitle className="text-left text-lg leading-snug">{quiz?.question}</DialogTitle>
           </DialogHeader>
           {!result ? (
-            <div className="space-y-2">
+            <div className="space-y-3">
+              <div>
+                <div className="mb-1 flex items-center justify-between text-xs font-bold">
+                  <span className="flex items-center gap-1 text-muted-foreground">
+                    <Timer className="h-3.5 w-3.5" /> Tempo
+                  </span>
+                  <span className={left <= 5 ? "text-destructive" : "text-muted-foreground"}>{left}s</span>
+                </div>
+                <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                  <div
+                    className={`h-full transition-all duration-300 ${left <= 5 ? "bg-destructive" : "gradient-pop"}`}
+                    style={{ width: `${Math.round((left / (quiz?.seconds_left || 15)) * 100)}%` }}
+                  />
+                </div>
+              </div>
               {quiz?.options.map((opt, i) => (
                 <Button
                   key={opt}
                   variant="secondary"
                   className="h-auto w-full justify-start whitespace-normal py-3 text-left"
                   disabled={busy}
-                  onClick={() =>
-                    run(async () => {
-                      const r = await api.answerQuiz(quiz.id, i);
-                      setResult(r);
-                    })
-                  }
+                  onClick={() => submitAnswer(i)}
                 >
                   {opt}
                 </Button>
@@ -465,17 +474,43 @@ function HomePage() {
             </div>
           ) : (
             <div className="space-y-3 text-center">
-              <div className="text-5xl">{result.correct ? "🎉" : "🙃"}</div>
-              <p className="font-extrabold">{result.correct ? `Esatto! +${result.points} punti` : "Ci sei cascato!"}</p>
+              <div className="animate-bounce text-5xl">{result.correct ? "🎉" : "🙃"}</div>
+              <p className="font-extrabold">
+                {result.correct ? "Esatto!" : result.expired ? "Tempo scaduto — Ci sei cascato!" : "Ci sei cascato!"}
+              </p>
+              {result.correct && (
+                <div className="flex justify-center gap-2">
+                  <span className="animate-in zoom-in inline-flex items-center gap-1 rounded-full bg-primary/15 px-3 py-1 text-sm font-extrabold text-primary">
+                    <Trophy className="h-4 w-4" /> +{result.points} punti
+                  </span>
+                  <span className="animate-in zoom-in inline-flex items-center gap-1 rounded-full bg-warning/15 px-3 py-1 text-sm font-extrabold text-warning">
+                    <Coins className="h-4 w-4" /> +{result.credits} crediti
+                  </span>
+                </div>
+              )}
               <p className="text-sm text-muted-foreground">{result.quip}</p>
-              {!result.correct && quiz && (
+              {!result.correct && quiz && result.answer >= 0 && (
                 <p className="text-sm font-semibold">Risposta giusta: {quiz.options[result.answer]}</p>
               )}
-              <Button className="w-full gradient-pop font-bold" onClick={() => setQuiz(null)}>
+              <Button
+                className="w-full gradient-pop font-bold"
+                disabled={busy}
+                onClick={() =>
+                  run(async () => {
+                    setResult(null);
+                    try {
+                      setQuiz(await api.drawQuiz());
+                    } catch {
+                      setQuiz(null);
+                    }
+                  })
+                }
+              >
                 Continua
               </Button>
             </div>
           )}
+
         </DialogContent>
       </Dialog>
 
