@@ -9,6 +9,11 @@ import { api, frameClass, difficultyLabel, difficultyTone, type Difficulty } fro
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
+type QuizDraw = Awaited<ReturnType<typeof api.drawQuiz>>;
+type QuizResult = Awaited<ReturnType<typeof api.answerQuiz>>;
+
+
+
 export const Route = createFileRoute("/_authenticated/gioca")({
   head: () => ({
     meta: [
