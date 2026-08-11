@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Ticket, Coins, Trophy, Users, Sparkles, RefreshCw, Video, Lock, Crown, Shield } from "lucide-react";
+import { Ticket, Coins, Trophy, Users, Sparkles, RefreshCw, Video, Lock, Crown, Shield, Timer } from "lucide-react";
 import { AppShell, useGameState } from "@/components/AppShell";
 import { useAdPlayer } from "@/components/AdPlayer";
 import { api, frameClass, difficultyLabel, difficultyTone, type Difficulty } from "@/lib/api";
