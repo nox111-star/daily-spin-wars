@@ -96,6 +96,12 @@ function AdminPage() {
             <TabsContent value="week">
               <WeekConfig data={data} onDone={refresh} />
             </TabsContent>
+            <TabsContent value="shop">
+              <ShopAdmin data={data} onDone={refresh} />
+            </TabsContent>
+            <TabsContent value="auto">
+              <AutomationPanel />
+            </TabsContent>
             <TabsContent value="chat">
               <ChatCleanup onDone={refresh} />
             </TabsContent>
