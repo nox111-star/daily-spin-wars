@@ -179,6 +179,7 @@ export type AdminOverview = {
     prize_champion: string;
     prize_team: string;
     champion_frame: string;
+    streak_reward: StreakReward;
     starts_at: string | null;
     ends_at: string | null;
     settled: boolean;
@@ -187,7 +188,9 @@ export type AdminOverview = {
   active_users: { username: string; avatar: string; last_seen: string }[];
   shop: ShopItem[];
   presets: ChatPreset[];
+  styles: CosmeticRow[];
 };
+
 
 export type WheelPrize = { label: string; credits: number; points: number; weight: number };
 
