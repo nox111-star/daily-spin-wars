@@ -5,7 +5,8 @@ import { toast } from "sonner";
 import { Video, Coins, Check } from "lucide-react";
 import { AppShell, useGameState } from "@/components/AppShell";
 import { useAdPlayer } from "@/components/AdPlayer";
-import { api, frameClass } from "@/lib/api";
+import { api } from "@/lib/api";
+import { Cosmetic } from "@/lib/cosmetics";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/shop")({
@@ -73,13 +74,13 @@ function ShopPage() {
           return (
             <article key={item.id} className="pop-card flex flex-col gap-3 p-4">
               <div className="flex items-center gap-3">
-                <span
-                  className={`grid h-14 w-14 shrink-0 place-items-center rounded-full bg-muted text-2xl ${
-                    item.kind === "frame" ? frameClass(item.value) : "av-frame"
-                  }`}
+                <Cosmetic
+                  value={item.kind === "frame" ? item.value : "none"}
+                  styles={state?.styles}
+                  className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-muted text-2xl"
                 >
                   {item.kind === "avatar" ? item.value : item.kind === "frame" ? "🖼️" : "🏷️"}
-                </span>
+                </Cosmetic>
                 <div className="min-w-0">
                   <h2 className="truncate font-extrabold">{item.name}</h2>
                   <p className="text-xs uppercase tracking-wide text-muted-foreground">{item.kind}</p>
