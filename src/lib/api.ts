@@ -1,4 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { CosmeticStyle, StyleMap } from "@/lib/cosmetics";
+
 
 /**
  * Tutte le azioni di gioco passano da funzioni sul database (SECURITY DEFINER)
@@ -20,6 +22,35 @@ function cleanError(message: string) {
 
 export type Difficulty = "medio" | "difficile" | "impossibile";
 
+export type StreakReward = {
+  type: "credits" | "points" | "item";
+  amount: number;
+  label: string;
+  item_kind?: "avatar" | "frame" | "title";
+  item_name?: string;
+  item_value?: string;
+};
+
+export type StreakState = {
+  count: number;
+  target: number;
+  last_date: string | null;
+  missed: number;
+  can_restore: boolean;
+  restore_videos: number;
+  recoverable: number;
+  claimed: { type: string; amount: number; label: string } | null;
+};
+
+export type CosmeticRow = {
+  value: string;
+  kind: "avatar" | "frame" | "title";
+  name: string;
+  style: CosmeticStyle;
+  active: boolean;
+};
+
+
 export type TeamFlow = {
   mode: "monday_free" | "proposal" | "locked";
   proposal: "A" | "B" | null;
@@ -39,6 +70,8 @@ export type GameState = {
   videos_left: number;
   can_watch_ticket_video: boolean;
   team: "A" | "B" | null;
+  streak: StreakState;
+  styles: StyleMap;
   team_flow: TeamFlow;
   week: {
     week_start: string;
@@ -47,9 +80,11 @@ export type GameState = {
     prize_champion: string;
     prize_team: string;
     champion_frame: string;
+    streak_reward: StreakReward;
     starts_at: string | null;
     ends_at: string | null;
   };
+
   team_counts: { a: number; b: number; total: number; pct_a: number; pct_b: number };
   wheel_free_available: boolean;
   wheel_extra_available: boolean;
@@ -144,6 +179,7 @@ export type AdminOverview = {
     prize_champion: string;
     prize_team: string;
     champion_frame: string;
+    streak_reward: StreakReward;
     starts_at: string | null;
     ends_at: string | null;
     settled: boolean;
@@ -152,7 +188,9 @@ export type AdminOverview = {
   active_users: { username: string; avatar: string; last_seen: string }[];
   shop: ShopItem[];
   presets: ChatPreset[];
+  styles: CosmeticRow[];
 };
+
 
 export type WheelPrize = { label: string; credits: number; points: number; weight: number };
 
@@ -218,6 +256,7 @@ export const api = {
     prize_champion: string;
     prize_team: string;
     champion_frame: string;
+    streak_reward: StreakReward;
     starts_at: string;
     ends_at: string;
   }) =>
@@ -228,9 +267,22 @@ export const api = {
       p_prize_champion: w.prize_champion,
       p_prize_team: w.prize_team,
       p_champion_frame: w.champion_frame,
+      p_streak_reward: w.streak_reward,
       p_starts_at: w.starts_at,
       p_ends_at: w.ends_at,
     }),
+  restoreStreak: (tokens: string[]) => rpc<{ count: number }>("restore_streak", { p_tokens: tokens }),
+  adminRunRollover: () => rpc<{ settled: number }>("admin_run_rollover"),
+  adminUpsertCosmeticStyle: (c: CosmeticRow) =>
+    rpc<{ ok: boolean }>("admin_upsert_cosmetic_style", {
+      p_value: c.value,
+      p_kind: c.kind,
+      p_name: c.name,
+      p_style: c.style,
+      p_active: c.active,
+    }),
+  adminDeleteCosmeticStyle: (value: string) => rpc<{ ok: boolean }>("admin_delete_cosmetic_style", { p_value: value }),
+
   adminUpsertShopItem: (i: ShopItem) =>
     rpc<{ ok: boolean }>("admin_upsert_shop_item", {
       p_id: i.id,

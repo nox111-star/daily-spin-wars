@@ -161,6 +161,36 @@ export type Database = {
         }
         Relationships: []
       }
+      cosmetic_styles: {
+        Row: {
+          active: boolean
+          created_at: string
+          kind: string
+          name: string
+          style: Json
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          kind?: string
+          name: string
+          style?: Json
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          kind?: string
+          name?: string
+          style?: Json
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       game_config: {
         Row: {
           key: string
@@ -260,6 +290,11 @@ export type Database = {
           quiz_answered: number
           quiz_correct: number
           quiz_index: number
+          streak_count: number
+          streak_date: string | null
+          streak_missed: number
+          streak_prev: number
+          streak_rewards: number
           team: string | null
           team_locked: boolean
           team_proposal: string | null
@@ -289,6 +324,11 @@ export type Database = {
           quiz_answered?: number
           quiz_correct?: number
           quiz_index?: number
+          streak_count?: number
+          streak_date?: string | null
+          streak_missed?: number
+          streak_prev?: number
+          streak_rewards?: number
           team?: string | null
           team_locked?: boolean
           team_proposal?: string | null
@@ -318,6 +358,11 @@ export type Database = {
           quiz_answered?: number
           quiz_correct?: number
           quiz_index?: number
+          streak_count?: number
+          streak_date?: string | null
+          streak_missed?: number
+          streak_prev?: number
+          streak_rewards?: number
           team?: string | null
           team_locked?: boolean
           team_proposal?: string | null
@@ -508,6 +553,7 @@ export type Database = {
           prize_team: string
           settled: boolean
           starts_at: string | null
+          streak_reward: Json
           team_a: string
           team_b: string
           week_start: string
@@ -519,6 +565,7 @@ export type Database = {
           prize_team: string
           settled?: boolean
           starts_at?: string | null
+          streak_reward?: Json
           team_a: string
           team_b: string
           week_start: string
@@ -530,6 +577,7 @@ export type Database = {
           prize_team?: string
           settled?: boolean
           starts_at?: string | null
+          streak_reward?: Json
           team_a?: string
           team_b?: string
           week_start?: string
@@ -562,12 +610,14 @@ export type Database = {
       accept_team: { Args: never; Returns: Json }
       admin_bulk_quiz: { Args: { p_items: Json }; Returns: Json }
       admin_clear_chat: { Args: { p_hours: number }; Returns: Json }
+      admin_delete_cosmetic_style: { Args: { p_value: string }; Returns: Json }
       admin_delete_quiz: { Args: { p_id: number }; Returns: Json }
       admin_delete_shop_item: { Args: { p_id: string }; Returns: Json }
       admin_get_automation: { Args: never; Returns: Json }
       admin_list_quizzes: { Args: never; Returns: Json }
       admin_overview: { Args: never; Returns: Json }
       admin_run_automation: { Args: never; Returns: Json }
+      admin_run_rollover: { Args: never; Returns: Json }
       admin_set_automation: {
         Args: {
           p_clear_chat: boolean
@@ -609,11 +659,35 @@ export type Database = {
             }
             Returns: Json
           }
+        | {
+            Args: {
+              p_champion_frame?: string
+              p_ends_at: string
+              p_prize_champion: string
+              p_prize_team: string
+              p_starts_at: string
+              p_streak_reward?: Json
+              p_team_a: string
+              p_team_b: string
+              p_week_start: string
+            }
+            Returns: Json
+          }
       admin_set_wheel_day: {
         Args: { p_day: string; p_prizes: Json }
         Returns: Json
       }
       admin_settle_week: { Args: { p_week: string }; Returns: Json }
+      admin_upsert_cosmetic_style: {
+        Args: {
+          p_active: boolean
+          p_kind: string
+          p_name: string
+          p_style: Json
+          p_value: string
+        }
+        Returns: Json
+      }
       admin_upsert_preset: {
         Args: {
           p_active: boolean
@@ -685,6 +759,11 @@ export type Database = {
           quiz_answered: number
           quiz_correct: number
           quiz_index: number
+          streak_count: number
+          streak_date: string | null
+          streak_missed: number
+          streak_prev: number
+          streak_rewards: number
           team: string | null
           team_locked: boolean
           team_proposal: string | null
@@ -716,6 +795,7 @@ export type Database = {
           prize_team: string
           settled: boolean
           starts_at: string | null
+          streak_reward: Json
           team_a: string
           team_b: string
           week_start: string
@@ -740,6 +820,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      grant_reward: {
+        Args: { p_reward: Json; p_source: string; uid: string }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -760,7 +844,9 @@ export type Database = {
         Returns: undefined
       }
       require_admin: { Args: never; Returns: string }
+      restore_streak: { Args: { p_tokens: string[] }; Returns: Json }
       run_automation: { Args: { p_force?: boolean }; Returns: Json }
+      run_rollover: { Args: never; Returns: Json }
       send_message: { Args: { p_preset: string }; Returns: Json }
       settle_week: { Args: { p_week: string }; Returns: Json }
       spin_morning_wheel: {
@@ -784,6 +870,11 @@ export type Database = {
           quiz_answered: number
           quiz_correct: number
           quiz_index: number
+          streak_count: number
+          streak_date: string | null
+          streak_missed: number
+          streak_prev: number
+          streak_rewards: number
           team: string | null
           team_locked: boolean
           team_proposal: string | null
@@ -814,6 +905,7 @@ export type Database = {
         }[]
       }
       team_leaderboard: { Args: never; Returns: Json }
+      touch_streak: { Args: { uid: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "user"
