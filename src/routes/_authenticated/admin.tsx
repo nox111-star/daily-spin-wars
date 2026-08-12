@@ -4,7 +4,18 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Users, MessageSquare, HelpCircle, Activity } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { api, frameClass, type AdminOverview, type Automation, type ShopItem, type WheelPrize } from "@/lib/api";
+import {
+  api,
+  frameClass,
+  type AdminOverview,
+  type Automation,
+  type CosmeticRow,
+  type ShopItem,
+  type StreakReward,
+  type WheelPrize,
+} from "@/lib/api";
+import { ANIMATIONS, DEFAULT_STYLE, cosmeticAnimClass, cosmeticCss, type CosmeticStyle } from "@/lib/cosmetics";
+
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
