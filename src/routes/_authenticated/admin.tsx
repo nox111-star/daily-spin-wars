@@ -279,6 +279,9 @@ function WeekConfig({ data, onDone }: { data: AdminOverview; onDone: () => void 
     starts_at: toLocalInput(w?.starts_at),
     ends_at: toLocalInput(w?.ends_at),
   });
+  const [reward, setReward] = useState<StreakReward>(
+    w?.streak_reward ?? { type: "credits", amount: 250, label: "250 crediti" },
+  );
   const [busy, setBusy] = useState(false);
 
   async function save() {
@@ -286,9 +289,11 @@ function WeekConfig({ data, onDone }: { data: AdminOverview; onDone: () => void 
     try {
       await api.adminSetWeek({
         ...form,
+        streak_reward: reward,
         starts_at: form.starts_at ? new Date(form.starts_at).toISOString() : "",
         ends_at: form.ends_at ? new Date(form.ends_at).toISOString() : "",
       });
+
       toast.success("Sfida settimanale aggiornata");
       onDone();
     } catch (err) {
