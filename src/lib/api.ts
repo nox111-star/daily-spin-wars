@@ -22,6 +22,35 @@ function cleanError(message: string) {
 
 export type Difficulty = "medio" | "difficile" | "impossibile";
 
+export type StreakReward = {
+  type: "credits" | "points" | "item";
+  amount: number;
+  label: string;
+  item_kind?: "avatar" | "frame" | "title";
+  item_name?: string;
+  item_value?: string;
+};
+
+export type StreakState = {
+  count: number;
+  target: number;
+  last_date: string | null;
+  missed: number;
+  can_restore: boolean;
+  restore_videos: number;
+  recoverable: number;
+  claimed: { type: string; amount: number; label: string } | null;
+};
+
+export type CosmeticRow = {
+  value: string;
+  kind: "avatar" | "frame" | "title";
+  name: string;
+  style: CosmeticStyle;
+  active: boolean;
+};
+
+
 export type TeamFlow = {
   mode: "monday_free" | "proposal" | "locked";
   proposal: "A" | "B" | null;
