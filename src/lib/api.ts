@@ -41,6 +41,8 @@ export type GameState = {
   videos_left: number;
   can_watch_ticket_video: boolean;
   team: "A" | "B" | null;
+  streak: StreakState;
+  styles: StyleMap;
   team_flow: TeamFlow;
   week: {
     week_start: string;
@@ -49,9 +51,11 @@ export type GameState = {
     prize_champion: string;
     prize_team: string;
     champion_frame: string;
+    streak_reward: StreakReward;
     starts_at: string | null;
     ends_at: string | null;
   };
+
   team_counts: { a: number; b: number; total: number; pct_a: number; pct_b: number };
   wheel_free_available: boolean;
   wheel_extra_available: boolean;
