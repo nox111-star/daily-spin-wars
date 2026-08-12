@@ -200,3 +200,30 @@
   border: 3px double var(--primary);
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--secondary) 30%, transparent);
 }
+
+/* Animazioni cosmetiche dinamiche (editor admin) */
+@keyframes cos-rainbow-kf {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+@keyframes cos-bounce-kf {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes cos-pulse-kf {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+@keyframes cos-spin-kf {
+  100% { transform: rotate(360deg); }
+}
+@keyframes cos-wobble-kf {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(6deg); }
+}
+.cos-rainbow { animation-name: cos-rainbow-kf; animation-timing-function: linear; animation-iteration-count: infinite; }
+.cos-bounce { animation-name: cos-bounce-kf; animation-timing-function: ease-in-out; animation-iteration-count: infinite; }
+.cos-pulse { animation-name: cos-pulse-kf; animation-timing-function: ease-in-out; animation-iteration-count: infinite; }
+.cos-spin { animation-name: cos-spin-kf; animation-timing-function: linear; animation-iteration-count: infinite; }
+.cos-wobble { animation-name: cos-wobble-kf; animation-timing-function: ease-in-out; animation-iteration-count: infinite; }
+.cos-rainbow-bounce { animation-name: cos-rainbow-kf, cos-bounce-kf; animation-timing-function: linear, ease-in-out; animation-iteration-count: infinite, infinite; }
