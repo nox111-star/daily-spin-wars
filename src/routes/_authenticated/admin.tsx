@@ -967,7 +967,7 @@ function StyleStudio({ data, onDone }: { data: AdminOverview; onDone: () => void
               id="cs-anim"
               className="h-10 rounded-md border border-input bg-background px-3 text-sm"
               value={draft.style.animation ?? "none"}
-              onChange={(e) => set({ animation: e.target.value as CosmeticStyle["animation"] })}
+              onChange={(e) => set({ animation: e.target.value as NonNullable<CosmeticStyle["animation"]> })}
             >
               {ANIMATIONS.map((a) => (
                 <option key={a} value={a}>
@@ -1002,7 +1002,7 @@ function StyleStudio({ data, onDone }: { data: AdminOverview; onDone: () => void
               id="cs-bstyle"
               className="h-10 rounded-md border border-input bg-background px-3 text-sm"
               value={draft.style.border_style ?? "solid"}
-              onChange={(e) => set({ border_style: e.target.value as CosmeticStyle["border_style"] })}
+              onChange={(e) => set({ border_style: e.target.value as NonNullable<CosmeticStyle["border_style"]> })}
             >
               <option value="solid">solid</option>
               <option value="dashed">dashed</option>
