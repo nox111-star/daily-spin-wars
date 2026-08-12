@@ -256,6 +256,7 @@ export const api = {
     prize_champion: string;
     prize_team: string;
     champion_frame: string;
+    streak_reward: StreakReward;
     starts_at: string;
     ends_at: string;
   }) =>
@@ -266,9 +267,22 @@ export const api = {
       p_prize_champion: w.prize_champion,
       p_prize_team: w.prize_team,
       p_champion_frame: w.champion_frame,
+      p_streak_reward: w.streak_reward,
       p_starts_at: w.starts_at,
       p_ends_at: w.ends_at,
     }),
+  restoreStreak: (tokens: string[]) => rpc<{ count: number }>("restore_streak", { p_tokens: tokens }),
+  adminRunRollover: () => rpc<{ settled: number }>("admin_run_rollover"),
+  adminUpsertCosmeticStyle: (c: CosmeticRow) =>
+    rpc<{ ok: boolean }>("admin_upsert_cosmetic_style", {
+      p_value: c.value,
+      p_kind: c.kind,
+      p_name: c.name,
+      p_style: c.style,
+      p_active: c.active,
+    }),
+  adminDeleteCosmeticStyle: (value: string) => rpc<{ ok: boolean }>("admin_delete_cosmetic_style", { p_value: value }),
+
   adminUpsertShopItem: (i: ShopItem) =>
     rpc<{ ok: boolean }>("admin_upsert_shop_item", {
       p_id: i.id,
