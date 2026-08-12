@@ -238,13 +238,13 @@ function HomePage() {
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="pop-card flex flex-col gap-3 border border-warning/40 bg-gradient-to-br from-warning/15 to-transparent p-4">
               <div className="flex items-center gap-3">
-                <span
-                  className={`grid h-14 w-14 shrink-0 place-items-center rounded-full bg-muted text-2xl ${frameClass(
-                    state.week.champion_frame,
-                  )}`}
+                <Cosmetic
+                  value={state.week.champion_frame}
+                  styles={state.styles}
+                  className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-muted text-2xl"
                 >
                   👑
-                </span>
+                </Cosmetic>
                 <div className="min-w-0">
                   <h3 className="truncate font-extrabold">{state.week.prize_champion}</h3>
                   <p className="text-xs uppercase tracking-wide text-muted-foreground">Premio Campione · cornice</p>
@@ -261,6 +261,77 @@ function HomePage() {
               <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Premio Squadra</p>
               <p className="mt-1 text-lg font-extrabold">{state.week.prize_team}</p>
               <p className="mt-1 text-xs text-muted-foreground">A tutti i membri della squadra vincitrice</p>
+            </div>
+
+            <div className="pop-card flex flex-col gap-3 border border-primary/40 bg-gradient-to-br from-primary/15 to-transparent p-4 sm:col-span-2">
+              <div className="flex items-center gap-3">
+                {streakReward.type === "item" && streakReward.item_value ? (
+                  <Cosmetic
+                    value={streakReward.item_value}
+                    styles={state.styles}
+                    className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-muted text-2xl"
+                  >
+                    {streakReward.item_kind === "avatar" ? streakReward.item_value : "🖼️"}
+                  </Cosmetic>
+                ) : (
+                  <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-muted text-2xl">
+                    {streakReward.type === "credits" ? "🪙" : "⭐"}
+                  </span>
+                )}
+                <div className="min-w-0">
+                  <h3 className="truncate font-extrabold">{streakReward.label || "Premio streak"}</h3>
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                    Premio streak · 7 giorni consecutivi
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-1.5">
+                {Array.from({ length: 7 }).map((_, i) => (
+                  <span
+                    key={i}
+                    className={`grid h-8 w-8 place-items-center rounded-full text-xs font-extrabold ${
+                      i < streak.count ? "gradient-pop text-primary-foreground" : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {i + 1}
+                  </span>
+                ))}
+                <span className="ml-1 flex items-center gap-1 text-sm font-bold">
+                  <Flame className="h-4 w-4 text-primary" />
+                  {streak.count}/7
+                </span>
+              </div>
+
+              {streak.can_restore ? (
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-xs text-muted-foreground">
+                    Hai perso {streak.missed} giorn{streak.missed === 1 ? "o" : "i"}: recupera la streak con 2 video.
+                  </p>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    disabled={busy}
+                    onClick={() =>
+                      run(async () => {
+                        const tokens: string[] = [];
+                        for (let i = 0; i < streak.restore_videos; i++) {
+                          const token = await playAd("streak");
+                          if (!token) throw new Error("Video non completato: recupero annullato");
+                          tokens.push(token);
+                        }
+                        await api.restoreStreak(tokens);
+                      }, "Streak recuperata!")
+                    }
+                  >
+                    <Video className="mr-1.5 h-4 w-4" /> Recupera con 2 video
+                  </Button>
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Apri l'app ogni giorno: al 7° accesso consecutivo il premio viene accreditato all'istante.
+                </p>
+              )}
             </div>
           </div>
         </section>
