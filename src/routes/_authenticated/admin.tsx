@@ -878,3 +878,240 @@ function AutomationPanel() {
     </section>
   );
 }
+
+/* ---------------- Editor grafico cosmetici ---------------- */
+
+function StyleStudio({ data, onDone }: { data: AdminOverview; onDone: () => void }) {
+  const [draft, setDraft] = useState<CosmeticRow>({
+    value: "",
+    kind: "frame",
+    name: "",
+    style: { ...DEFAULT_STYLE },
+    active: true,
+  });
+  const [busy, setBusy] = useState(false);
+
+  const set = (patch: Partial<CosmeticStyle>) => setDraft((d) => ({ ...d, style: { ...d.style, ...patch } }));
+
+  async function save() {
+    if (!draft.value.trim() || !draft.name.trim()) {
+      toast.error("Servono identificativo e nome");
+      return;
+    }
+    setBusy(true);
+    try {
+      await api.adminUpsertCosmeticStyle(draft);
+      toast.success("Stile salvato: già disponibile nell'app");
+      onDone();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Salvataggio non riuscito");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function remove(value: string) {
+    try {
+      await api.adminDeleteCosmeticStyle(value);
+      toast.success("Stile eliminato");
+      onDone();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Eliminazione non riuscita");
+    }
+  }
+
+  return (
+    <section className="pop-card p-4">
+      <h2 className="font-display text-lg font-extrabold">Editor grafico cosmetici</h2>
+      <p className="mb-4 text-sm text-muted-foreground">
+        Crea cornici, avatar e titoli con animazioni personalizzate. I parametri vengono salvati nel database e
+        renderizzati dinamicamente ovunque nell'app (shop, profilo, chat, classifiche).
+      </p>
+
+      <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-1.5">
+            <Label htmlFor="cs-value">Identificativo (univoco)</Label>
+            <Input
+              id="cs-value"
+              placeholder="rainbow-hop"
+              value={draft.value}
+              onChange={(e) => setDraft((d) => ({ ...d, value: e.target.value }))}
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="cs-name">Nome visibile</Label>
+            <Input
+              id="cs-name"
+              placeholder="Arcobaleno Saltellante"
+              value={draft.name}
+              onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))}
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="cs-kind">Tipo</Label>
+            <select
+              id="cs-kind"
+              className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+              value={draft.kind}
+              onChange={(e) => setDraft((d) => ({ ...d, kind: e.target.value as CosmeticRow["kind"] }))}
+            >
+              <option value="frame">Cornice</option>
+              <option value="avatar">Avatar</option>
+              <option value="title">Titolo</option>
+            </select>
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="cs-anim">Animazione</Label>
+            <select
+              id="cs-anim"
+              className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+              value={draft.style.animation ?? "none"}
+              onChange={(e) => set({ animation: e.target.value as CosmeticStyle["animation"] })}
+            >
+              {ANIMATIONS.map((a) => (
+                <option key={a} value={a}>
+                  {a}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="cs-c1">Colore principale</Label>
+            <Input
+              id="cs-c1"
+              type="color"
+              className="h-10 w-24 p-1"
+              value={draft.style.border_color ?? "#FF4D8D"}
+              onChange={(e) => set({ border_color: e.target.value })}
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="cs-c2">Colore secondario</Label>
+            <Input
+              id="cs-c2"
+              type="color"
+              className="h-10 w-24 p-1"
+              value={draft.style.border_color_2 ?? "#00C2FF"}
+              onChange={(e) => set({ border_color_2: e.target.value })}
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="cs-bstyle">Stile bordo</Label>
+            <select
+              id="cs-bstyle"
+              className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+              value={draft.style.border_style ?? "solid"}
+              onChange={(e) => set({ border_style: e.target.value as CosmeticStyle["border_style"] })}
+            >
+              <option value="solid">solid</option>
+              <option value="dashed">dashed</option>
+              <option value="dotted">dotted</option>
+              <option value="double">double</option>
+            </select>
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="cs-bw">Spessore bordo (px)</Label>
+            <Input
+              id="cs-bw"
+              type="number"
+              min={0}
+              max={12}
+              value={draft.style.border_width ?? 3}
+              onChange={(e) => set({ border_width: Math.max(0, Number(e.target.value)) })}
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="cs-glow">Bagliore</Label>
+            <Input
+              id="cs-glow"
+              type="number"
+              min={0}
+              max={40}
+              value={draft.style.glow ?? 0}
+              onChange={(e) => set({ glow: Math.max(0, Number(e.target.value)) })}
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="cs-speed">Velocità animazione (s)</Label>
+            <Input
+              id="cs-speed"
+              type="number"
+              min={0.2}
+              step={0.1}
+              value={draft.style.speed ?? 2}
+              onChange={(e) => set({ speed: Math.max(0.2, Number(e.target.value)) })}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <Switch
+              id="cs-bg"
+              checked={Boolean(draft.style.bg)}
+              onCheckedChange={(v) => set({ bg: v ? "gradient" : "" })}
+            />
+            <Label htmlFor="cs-bg">Sfondo sfumato</Label>
+          </div>
+          <div className="flex items-center gap-2">
+            <Switch
+              id="cs-active"
+              checked={draft.active}
+              onCheckedChange={(v) => setDraft((d) => ({ ...d, active: v }))}
+            />
+            <Label htmlFor="cs-active">Attivo</Label>
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-muted/40 p-6">
+          <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Anteprima live</span>
+          <span
+            className={`grid h-20 w-20 place-items-center rounded-full bg-card text-3xl ${cosmeticAnimClass(draft.style)}`}
+            style={cosmeticCss(draft.style)}
+          >
+            🐣
+          </span>
+          <span className="text-sm font-extrabold">{draft.name || "Nuovo stile"}</span>
+        </div>
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Button onClick={save} disabled={busy}>
+          {busy ? "Salvo…" : "Salva stile"}
+        </Button>
+        <Button variant="outline" onClick={() => setDraft((d) => ({ ...d, style: { ...DEFAULT_STYLE } }))}>
+          Ripristina parametri
+        </Button>
+      </div>
+
+      <h3 className="mt-6 font-display text-base font-extrabold">Stili esistenti</h3>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {(data.styles ?? []).map((s) => (
+          <div key={s.value} className="flex items-center gap-3 rounded-2xl border border-border p-3">
+            <span
+              className={`grid h-12 w-12 shrink-0 place-items-center rounded-full bg-card text-xl ${cosmeticAnimClass(s.style)}`}
+              style={cosmeticCss(s.style)}
+            >
+              {s.kind === "title" ? "🏷️" : "🐣"}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate font-extrabold">{s.name}</p>
+              <p className="truncate text-xs text-muted-foreground">
+                {s.kind} · {s.value} {s.active ? "" : "· disattivo"}
+              </p>
+            </div>
+            <div className="flex shrink-0 flex-col gap-1">
+              <Button size="sm" variant="outline" onClick={() => setDraft({ ...s })}>
+                Modifica
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => remove(s.value)}>
+                Elimina
+              </Button>
+            </div>
+          </div>
+        ))}
+        {(data.styles ?? []).length === 0 && (
+          <p className="text-sm text-muted-foreground">Nessuno stile personalizzato: creane uno qui sopra.</p>
+        )}
+      </div>
+    </section>
+  );
+}
