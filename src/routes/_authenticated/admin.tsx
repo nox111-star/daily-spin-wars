@@ -356,6 +356,81 @@ function WeekConfig({ data, onDone }: { data: AdminOverview; onDone: () => void 
         {field("starts_at", "Apertura sfida", "datetime-local")}
         {field("ends_at", "Chiusura sfida", "datetime-local")}
       </div>
+
+      <h3 className="mt-5 font-display text-base font-extrabold">Premio streak 7 giorni</h3>
+      <p className="mb-2 text-sm text-muted-foreground">
+        Assegnato automaticamente al 7° accesso consecutivo. Gli utenti ne vedono l'anteprima nell'app.
+      </p>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-1.5">
+          <Label htmlFor="rw-type">Tipo di premio</Label>
+          <select
+            id="rw-type"
+            className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+            value={reward.type}
+            onChange={(e) => setReward((r) => ({ ...r, type: e.target.value as StreakReward["type"] }))}
+          >
+            <option value="credits">Crediti</option>
+            <option value="points">Punti</option>
+            <option value="item">Cosmetico (avatar / cornice / titolo)</option>
+          </select>
+        </div>
+        <div className="grid gap-1.5">
+          <Label htmlFor="rw-label">Etichetta mostrata ai giocatori</Label>
+          <Input
+            id="rw-label"
+            value={reward.label}
+            onChange={(e) => setReward((r) => ({ ...r, label: e.target.value }))}
+          />
+        </div>
+        {reward.type !== "item" ? (
+          <div className="grid gap-1.5">
+            <Label htmlFor="rw-amount">Quantità</Label>
+            <Input
+              id="rw-amount"
+              type="number"
+              min={0}
+              value={reward.amount}
+              onChange={(e) => setReward((r) => ({ ...r, amount: Math.max(0, Number(e.target.value)) }))}
+            />
+          </div>
+        ) : (
+          <>
+            <div className="grid gap-1.5">
+              <Label htmlFor="rw-kind">Tipo cosmetico</Label>
+              <select
+                id="rw-kind"
+                className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                value={reward.item_kind ?? "frame"}
+                onChange={(e) =>
+                  setReward((r) => ({ ...r, item_kind: e.target.value as NonNullable<StreakReward["item_kind"]> }))
+                }
+              >
+                <option value="frame">Cornice</option>
+                <option value="avatar">Avatar</option>
+                <option value="title">Titolo</option>
+              </select>
+            </div>
+            <div className="grid gap-1.5">
+              <Label htmlFor="rw-name">Nome cosmetico</Label>
+              <Input
+                id="rw-name"
+                value={reward.item_name ?? ""}
+                onChange={(e) => setReward((r) => ({ ...r, item_name: e.target.value }))}
+              />
+            </div>
+            <div className="grid gap-1.5">
+              <Label htmlFor="rw-value">Identificativo (dall'editor grafico)</Label>
+              <Input
+                id="rw-value"
+                value={reward.item_value ?? ""}
+                onChange={(e) => setReward((r) => ({ ...r, item_value: e.target.value }))}
+              />
+            </div>
+          </>
+        )}
+      </div>
+
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <Button onClick={save} disabled={busy}>
           {busy ? "Salvo…" : "Salva sfida"}
@@ -363,8 +438,25 @@ function WeekConfig({ data, onDone }: { data: AdminOverview; onDone: () => void 
         <Button variant="outline" onClick={settle} disabled={busy || !form.week_start}>
           Distribuisci premi ora
         </Button>
+        <Button
+          variant="outline"
+          onClick={() =>
+            api
+              .adminRunRollover()
+              .then((r) => toast.success(`Rollover eseguito — ${r.settled} settimane chiuse`))
+              .then(onDone)
+              .catch((e: unknown) => toast.error(e instanceof Error ? e.message : "Rollover non riuscito"))
+          }
+        >
+          Forza rollover
+        </Button>
         {w?.settled && <span className="text-xs font-semibold text-muted-foreground">Settimana già chiusa</span>}
       </div>
+      <p className="mt-2 text-xs text-muted-foreground">
+        Il rollover automatico gira in background ogni 5 minuti: alla scadenza dell'orario di fine, la classifica viene
+        calcolata e i premi assegnati senza intervento manuale.
+      </p>
+
     </section>
   );
 }
