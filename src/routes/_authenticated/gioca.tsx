@@ -2,10 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Ticket, Coins, Trophy, Users, Sparkles, RefreshCw, Video, Lock, Crown, Shield, Timer } from "lucide-react";
+import { Ticket, Coins, Trophy, Users, Sparkles, RefreshCw, Video, Lock, Crown, Shield, Timer, Flame } from "lucide-react";
 import { AppShell, useGameState } from "@/components/AppShell";
 import { useAdPlayer } from "@/components/AdPlayer";
 import { api, frameClass, difficultyLabel, difficultyTone, type Difficulty } from "@/lib/api";
+import { Cosmetic } from "@/lib/cosmetics";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -116,6 +117,8 @@ function HomePage() {
 
   const flow = state.team_flow;
   const pctA = state.team_counts.pct_a;
+  const streak = state.streak;
+  const streakReward = state.week.streak_reward;
 
   return (
     <AppShell>
