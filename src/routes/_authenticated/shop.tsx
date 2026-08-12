@@ -76,7 +76,7 @@ function ShopPage() {
               <div className="flex items-center gap-3">
                 <Cosmetic
                   value={item.kind === "frame" ? item.value : "none"}
-                  styles={state?.styles}
+                  styles={state?.styles ?? {}}
                   className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-muted text-2xl"
                 >
                   {item.kind === "avatar" ? item.value : item.kind === "frame" ? "🖼️" : "🏷️"}
