@@ -107,6 +107,16 @@ function HomePage() {
     return t === "A" ? state.week.team_a : state.week.team_b;
   }, [state]);
 
+  const claimedRef = useRef<string | null>(null);
+  useEffect(() => {
+    const claimed = state?.streak.claimed;
+    if (!claimed) return;
+    const key = `${claimed.type}:${claimed.amount}:${state?.streak.last_date ?? ""}`;
+    if (claimedRef.current === key) return;
+    claimedRef.current = key;
+    toast.success(`Streak completata! Premio riscosso: ${claimed.label}`);
+  }, [state]);
+
   if (isLoading || !state) {
     return (
       <AppShell>
