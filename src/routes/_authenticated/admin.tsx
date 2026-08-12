@@ -94,6 +94,7 @@ function AdminPage() {
               <TabsTrigger value="wheel">Ruota 10 giorni</TabsTrigger>
               <TabsTrigger value="week">Sfida settimanale</TabsTrigger>
               <TabsTrigger value="shop">Shop</TabsTrigger>
+              <TabsTrigger value="styles">Editor grafico</TabsTrigger>
               <TabsTrigger value="auto">Automazioni</TabsTrigger>
               <TabsTrigger value="chat">Chat</TabsTrigger>
               <TabsTrigger value="live">Live monitor</TabsTrigger>
@@ -111,6 +112,10 @@ function AdminPage() {
             <TabsContent value="shop">
               <ShopAdmin data={data} onDone={refresh} />
             </TabsContent>
+            <TabsContent value="styles">
+              <StyleStudio data={data} onDone={refresh} />
+            </TabsContent>
+
             <TabsContent value="auto">
               <AutomationPanel />
             </TabsContent>
