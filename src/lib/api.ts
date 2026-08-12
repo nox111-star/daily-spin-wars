@@ -1,4 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { CosmeticStyle, StyleMap } from "@/lib/cosmetics";
+
 
 /**
  * Tutte le azioni di gioco passano da funzioni sul database (SECURITY DEFINER)
