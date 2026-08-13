@@ -51,6 +51,19 @@ export type CosmeticRow = {
 };
 
 
+export type DayResult = { difficulty: string; ok: boolean; expired?: boolean; points?: number };
+
+export type JobName = "wheel" | "week" | "streak" | "chat";
+
+export type AutoJob = {
+  job: JobName;
+  enabled: boolean;
+  run_at: string;
+  payload: Record<string, unknown>;
+  last_run_date: string | null;
+  last_run_detail: Record<string, unknown> | null;
+};
+
 export type TeamFlow = {
   mode: "monday_free" | "proposal" | "locked";
   proposal: "A" | "B" | null;
