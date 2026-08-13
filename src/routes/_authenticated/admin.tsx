@@ -14,7 +14,16 @@ import {
   type StreakReward,
   type WheelPrize,
 } from "@/lib/api";
-import { ANIMATIONS, DEFAULT_STYLE, cosmeticAnimClass, cosmeticCss, type CosmeticStyle } from "@/lib/cosmetics";
+import {
+  ANIMATIONS,
+  CROWN_ANIMATIONS,
+  CROWN_PRESETS,
+  DEFAULT_STYLE,
+  CrownBadge,
+  cosmeticAnimClass,
+  cosmeticCss,
+  type CosmeticStyle,
+} from "@/lib/cosmetics";
 
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
