@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { Ticket, Coins, Trophy, Users, Sparkles, RefreshCw, Video, Lock, Crown, Shield, Timer, Flame } from "lucide-react";
 import { AppShell, useGameState } from "@/components/AppShell";
 import { useAdPlayer } from "@/components/AdPlayer";
+import { SpinWheel } from "@/components/SpinWheel";
+import { DayRecap } from "@/components/DayRecap";
 import { api, frameClass, difficultyLabel, difficultyTone, type Difficulty } from "@/lib/api";
 import { Cosmetic } from "@/lib/cosmetics";
 import { Button } from "@/components/ui/button";
