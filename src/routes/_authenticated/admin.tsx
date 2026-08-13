@@ -457,10 +457,14 @@ function WeekConfig({ data, onDone }: { data: AdminOverview; onDone: () => void 
         {w?.settled && <span className="text-xs font-semibold text-muted-foreground">Settimana già chiusa</span>}
       </div>
       <p className="mt-2 text-xs text-muted-foreground">
-        Il rollover automatico gira in background ogni 5 minuti: alla scadenza dell'orario di fine, la classifica viene
-        calcolata e i premi assegnati senza intervento manuale.
+        Il rollover automatico gira in background: alla scadenza dell'orario di fine, la classifica viene calcolata e i
+        premi assegnati senza intervento manuale.
       </p>
 
+      <JobScheduler
+        job="week"
+        description="All'orario indicato chiude la stagione: distribuisce titolo di squadra e cornice corona al campione, azzera i punti e apre la nuova settimana con nomi e premi aggiornati."
+      />
     </section>
   );
 }
