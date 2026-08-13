@@ -398,35 +398,39 @@ function HomePage() {
             <Sparkles className="h-5 w-5 text-warning" /> Ruota del Mattino
           </h2>
           <p className="text-sm text-muted-foreground">
-            Un giro gratis al giorno più un giro extra con video. I premi seguono il calendario impostato dallo staff.
+            Un giro gratis al giorno più un giro extra con video. Gli spicchi mostrano i premi di oggi.
           </p>
-          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-            <Button
-              className="gradient-pop font-bold"
-              disabled={busy || !state.wheel_free_available}
-              onClick={() =>
-                run(async () => {
-                  const r = await api.spinWheel(false, null);
-                  setWheelResult(r.label);
-                })
-              }
-            >
-              {state.wheel_free_available ? "Giro gratuito" : "Giro gratuito usato"}
-            </Button>
-            <Button
-              variant="secondary"
-              disabled={busy || !state.wheel_extra_available || state.wheel_free_available}
-              onClick={() =>
-                run(async () => {
-                  const token = await playAd("wheel");
-                  if (!token) throw new Error("Video non completato");
-                  const r = await api.spinWheel(true, token);
-                  setWheelResult(r.label);
-                })
-              }
-            >
-              <Video className="mr-1.5 h-4 w-4" /> Giro extra
-            </Button>
+
+          <div className="mt-4 flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:justify-center">
+            <SpinWheel
+              prizes={wheelPrizes}
+              target={spinTarget}
+              size={250}
+              onSettled={() => {
+                if (pendingPrize) setWheelResult(pendingPrize.label);
+                setSpinTarget(null);
+                void refresh();
+              }}
+            />
+            <div className="flex w-full flex-col gap-2 sm:w-auto">
+              <Button
+                className="gradient-pop font-bold"
+                disabled={busy || spinning || !state.wheel_free_available}
+                onClick={() => void spin(false)}
+              >
+                {state.wheel_free_available ? "Giro gratuito" : "Giro gratuito usato"}
+              </Button>
+              <Button
+                variant="secondary"
+                disabled={busy || spinning || !state.wheel_extra_available || state.wheel_free_available}
+                onClick={() => void spin(true)}
+              >
+                <Video className="mr-1.5 h-4 w-4" /> Giro extra
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                {wheelPrizes.length} premi in palio oggi · assegnazione validata dal server
+              </p>
+            </div>
           </div>
         </section>
 
