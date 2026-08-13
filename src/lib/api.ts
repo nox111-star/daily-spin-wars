@@ -204,6 +204,7 @@ export type AdminOverview = {
   shop: ShopItem[];
   presets: ChatPreset[];
   styles: CosmeticRow[];
+  jobs: Partial<Record<JobName, AutoJob>>;
 };
 
 
