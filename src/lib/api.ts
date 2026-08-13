@@ -82,6 +82,8 @@ export type GameState = {
   videos_used: number;
   videos_left: number;
   can_watch_ticket_video: boolean;
+  day_results: DayResult[];
+  wheel_prizes: WheelPrize[];
   team: "A" | "B" | null;
   streak: StreakState;
   styles: StyleMap;
