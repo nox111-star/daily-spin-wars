@@ -437,6 +437,7 @@ function HomePage() {
               onSettled={() => {
                 if (pendingPrize) setWheelResult(pendingPrize.label);
                 setSpinTarget(null);
+                setSpinning(false);
                 void refresh();
               }}
             />
