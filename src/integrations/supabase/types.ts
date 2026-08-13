@@ -65,6 +65,39 @@ export type Database = {
         }
         Relationships: []
       }
+      auto_jobs: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          job: string
+          last_run_date: string | null
+          last_run_detail: Json | null
+          payload: Json
+          run_at: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          job: string
+          last_run_date?: string | null
+          last_run_detail?: Json | null
+          payload?: Json
+          run_at?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          job?: string
+          last_run_date?: string | null
+          last_run_detail?: Json | null
+          payload?: Json
+          run_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       automation_settings: {
         Row: {
           clear_chat: boolean
@@ -280,6 +313,7 @@ export type Database = {
           base_left: number
           bonus_left: number
           created_at: string
+          day_results: Json
           emergency_count: number
           emergency_date: string | null
           last_ticket_at: string
@@ -314,6 +348,7 @@ export type Database = {
           base_left?: number
           bonus_left?: number
           created_at?: string
+          day_results?: Json
           emergency_count?: number
           emergency_date?: string | null
           last_ticket_at?: string
@@ -348,6 +383,7 @@ export type Database = {
           base_left?: number
           bonus_left?: number
           created_at?: string
+          day_results?: Json
           emergency_count?: number
           emergency_date?: string | null
           last_ticket_at?: string
@@ -614,9 +650,11 @@ export type Database = {
       admin_delete_quiz: { Args: { p_id: number }; Returns: Json }
       admin_delete_shop_item: { Args: { p_id: string }; Returns: Json }
       admin_get_automation: { Args: never; Returns: Json }
+      admin_list_jobs: { Args: never; Returns: Json }
       admin_list_quizzes: { Args: never; Returns: Json }
       admin_overview: { Args: never; Returns: Json }
       admin_run_automation: { Args: never; Returns: Json }
+      admin_run_job: { Args: { p_job: string }; Returns: Json }
       admin_run_rollover: { Args: never; Returns: Json }
       admin_set_automation: {
         Args: {
@@ -631,6 +669,15 @@ export type Database = {
       }
       admin_set_config: {
         Args: { p_key: string; p_value: Json }
+        Returns: Json
+      }
+      admin_set_job: {
+        Args: {
+          p_enabled: boolean
+          p_job: string
+          p_payload: Json
+          p_run_at: string
+        }
         Returns: Json
       }
       admin_set_week:
@@ -749,6 +796,7 @@ export type Database = {
           base_left: number
           bonus_left: number
           created_at: string
+          day_results: Json
           emergency_count: number
           emergency_date: string | null
           last_ticket_at: string
@@ -846,6 +894,8 @@ export type Database = {
       require_admin: { Args: never; Returns: string }
       restore_streak: { Args: { p_tokens: string[] }; Returns: Json }
       run_automation: { Args: { p_force?: boolean }; Returns: Json }
+      run_job: { Args: { p_force?: boolean; p_job: string }; Returns: Json }
+      run_jobs: { Args: never; Returns: Json }
       run_rollover: { Args: never; Returns: Json }
       send_message: { Args: { p_preset: string }; Returns: Json }
       settle_week: { Args: { p_week: string }; Returns: Json }
@@ -860,6 +910,7 @@ export type Database = {
           base_left: number
           bonus_left: number
           created_at: string
+          day_results: Json
           emergency_count: number
           emergency_date: string | null
           last_ticket_at: string
