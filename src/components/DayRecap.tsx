@@ -10,8 +10,10 @@ const MARK: Record<string, { ok: string; ko: string }> = {
   impossibile: { ok: "🟣", ko: "⬛" },
 };
 
+const FALLBACK = { ok: "🟢", ko: "⬜" };
+
 function mark(r: DayResult) {
-  const set = MARK[r.difficulty] ?? MARK["medio"];
+  const set = MARK[r.difficulty] ?? FALLBACK;
   return r.ok ? set.ok : set.ko;
 }
 
