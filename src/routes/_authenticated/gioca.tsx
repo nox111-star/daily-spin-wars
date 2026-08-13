@@ -385,7 +385,7 @@ function HomePage() {
                 <Ticket className="h-5 w-5 text-primary" /> Ticket
               </h2>
               <p className="text-sm text-muted-foreground">
-                {state.base_left} base · {state.bonus_left} bonus · video rimasti {state.videos_left}
+                {state.base_left} giornalieri · {state.bonus_left} bonus accumulati · video rimasti {state.videos_left}
               </p>
             </div>
             <div className="flex shrink-0 flex-wrap justify-end gap-1 text-xl">
