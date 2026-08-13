@@ -276,6 +276,13 @@ function WheelCalendar({ data, onDone }: { data: AdminOverview; onDone: () => vo
           {busy ? "Salvo…" : "Salva giornata"}
         </Button>
       </div>
+
+      <JobScheduler
+        job="wheel"
+        payload={{ prizes }}
+        description="All'orario indicato la ruota dei prossimi 10 giorni viene rigenerata con i premi qui sopra."
+        payloadHint="Salvando la pianificazione vengono memorizzati i premi attualmente visibili come modello automatico."
+      />
     </section>
   );
 }
