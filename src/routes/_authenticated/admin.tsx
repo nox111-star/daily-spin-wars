@@ -8,13 +8,22 @@ import {
   api,
   frameClass,
   type AdminOverview,
-  type Automation,
   type CosmeticRow,
+  type JobName,
   type ShopItem,
   type StreakReward,
   type WheelPrize,
 } from "@/lib/api";
-import { ANIMATIONS, DEFAULT_STYLE, cosmeticAnimClass, cosmeticCss, type CosmeticStyle } from "@/lib/cosmetics";
+import {
+  ANIMATIONS,
+  CROWN_ANIMATIONS,
+  CROWN_PRESETS,
+  DEFAULT_STYLE,
+  CrownBadge,
+  cosmeticAnimClass,
+  cosmeticCss,
+  type CosmeticStyle,
+} from "@/lib/cosmetics";
 
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
@@ -91,12 +100,12 @@ function AdminPage() {
           <Tabs defaultValue="quiz">
             <TabsList className="mb-4 flex w-full flex-wrap justify-start gap-1">
               <TabsTrigger value="quiz">Quiz</TabsTrigger>
-              <TabsTrigger value="wheel">Ruota 10 giorni</TabsTrigger>
+              <TabsTrigger value="wheel">Ruota 10 gg</TabsTrigger>
               <TabsTrigger value="week">Sfida settimanale</TabsTrigger>
+              <TabsTrigger value="streak">Streak 7 gg</TabsTrigger>
+              <TabsTrigger value="chat">Chat</TabsTrigger>
               <TabsTrigger value="shop">Shop</TabsTrigger>
               <TabsTrigger value="styles">Editor grafico</TabsTrigger>
-              <TabsTrigger value="auto">Automazioni</TabsTrigger>
-              <TabsTrigger value="chat">Chat</TabsTrigger>
               <TabsTrigger value="live">Live monitor</TabsTrigger>
             </TabsList>
 
@@ -109,15 +118,14 @@ function AdminPage() {
             <TabsContent value="week">
               <WeekConfig data={data} onDone={refresh} />
             </TabsContent>
+            <TabsContent value="streak">
+              <StreakSection />
+            </TabsContent>
             <TabsContent value="shop">
               <ShopAdmin data={data} onDone={refresh} />
             </TabsContent>
             <TabsContent value="styles">
               <StyleStudio data={data} onDone={refresh} />
-            </TabsContent>
-
-            <TabsContent value="auto">
-              <AutomationPanel />
             </TabsContent>
             <TabsContent value="chat">
               <ChatCleanup onDone={refresh} />
@@ -277,6 +285,13 @@ function WheelCalendar({ data, onDone }: { data: AdminOverview; onDone: () => vo
           {busy ? "Salvo…" : "Salva giornata"}
         </Button>
       </div>
+
+      <JobScheduler
+        job="wheel"
+        payload={{ prizes }}
+        description="All'orario indicato la ruota dei prossimi 10 giorni viene rigenerata con i premi qui sopra."
+        payloadHint="Salvando la pianificazione vengono memorizzati i premi attualmente visibili come modello automatico."
+      />
     </section>
   );
 }
@@ -458,10 +473,14 @@ function WeekConfig({ data, onDone }: { data: AdminOverview; onDone: () => void 
         {w?.settled && <span className="text-xs font-semibold text-muted-foreground">Settimana già chiusa</span>}
       </div>
       <p className="mt-2 text-xs text-muted-foreground">
-        Il rollover automatico gira in background ogni 5 minuti: alla scadenza dell'orario di fine, la classifica viene
-        calcolata e i premi assegnati senza intervento manuale.
+        Il rollover automatico gira in background: alla scadenza dell'orario di fine, la classifica viene calcolata e i
+        premi assegnati senza intervento manuale.
       </p>
 
+      <JobScheduler
+        job="week"
+        description="All'orario indicato chiude la stagione: distribuisce titolo di squadra e cornice corona al campione, azzera i punti e apre la nuova settimana con nomi e premi aggiornati."
+      />
     </section>
   );
 }
@@ -514,6 +533,13 @@ function ChatCleanup({ onDone }: { onDone: () => void }) {
           {busy ? "Pulisco…" : "Pulisci chat"}
         </Button>
       </div>
+
+      <JobScheduler
+        job="chat"
+        payload={{ keep_hours: hours }}
+        description="All'orario indicato la chat viene svuotata automaticamente."
+        payloadHint="Salvando la pianificazione viene memorizzato il numero di ore da conservare indicato qui sopra."
+      />
     </section>
   );
 }
@@ -724,32 +750,43 @@ function ShopAdmin({ data, onDone }: { data: AdminOverview; onDone: () => void }
   );
 }
 
-/* ---------------- Automation ---------------- */
+/* ---------------- Pilota automatico per sezione ---------------- */
 
-const DOW = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
+const JOB_LABEL: Record<JobName, string> = {
+  wheel: "Aggiornamento ruota (10 giorni)",
+  week: "Nuova stagione e premi",
+  streak: "Reset streak 7 giorni",
+  chat: "Svuotamento chat",
+};
 
-function AutomationPanel() {
-  const { data, refetch, isLoading } = useQuery({ queryKey: ["automation"], queryFn: api.adminGetAutomation, retry: false });
-  const [form, setForm] = useState<Automation | null>(null);
+function JobScheduler({
+  job,
+  description,
+  payload,
+  payloadHint,
+}: {
+  job: JobName;
+  description: string;
+  payload?: Record<string, unknown>;
+  payloadHint?: string;
+}) {
+  const { data, refetch, isLoading } = useQuery({ queryKey: ["admin-jobs"], queryFn: api.adminListJobs, retry: false });
+  const current = data?.[job];
+  const [enabled, setEnabled] = useState(false);
+  const [runAt, setRunAt] = useState("05:00");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (data) setForm(data);
-  }, [data]);
-
-  if (isLoading || !form) return <p className="text-muted-foreground">Caricamento…</p>;
-
-  const set = (patch: Partial<Automation>) => setForm((f) => (f ? { ...f, ...patch } : f));
-
-  const updatePrize = (i: number, patch: Partial<WheelPrize>) =>
-    set({ wheel_template: form.wheel_template.map((p, idx) => (idx === i ? { ...p, ...patch } : p)) });
+    if (!current) return;
+    setEnabled(current.enabled);
+    setRunAt((current.run_at ?? "05:00:00").slice(0, 5));
+  }, [current]);
 
   async function save() {
-    if (!form) return;
     setBusy(true);
     try {
-      await api.adminSetAutomation(form);
-      toast.success("Automazione aggiornata");
+      await api.adminSetJob(job, enabled, `${runAt}:00`, payload ?? current?.payload ?? {});
+      toast.success("Pilota automatico aggiornato");
       await refetch();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Salvataggio non riuscito");
@@ -761,8 +798,8 @@ function AutomationPanel() {
   async function runNow() {
     setBusy(true);
     try {
-      const r = await api.adminRunAutomation();
-      toast.success(r.ok ? "Automazione eseguita" : r.reason ?? "Nessuna operazione da eseguire");
+      const r = await api.adminRunJob(job);
+      toast.success(r.ok ? "Attività eseguita" : (r.reason ?? "Nessuna azione"));
       await refetch();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Esecuzione non riuscita");
@@ -771,110 +808,57 @@ function AutomationPanel() {
     }
   }
 
-  return (
-    <section className="pop-card p-4">
-      <h2 className="font-display text-lg font-extrabold">Pilota automatico</h2>
-      <p className="mb-3 text-sm text-muted-foreground">
-        All'orario indicato il sistema aggiorna la ruota del mattino, svuota la chat e — nel giorno di fine stagione —
-        assegna il premio alla squadra prima in classifica, la cornice corona al campione individuale e azzera i punti
-        di tutti.
-      </p>
+  if (isLoading) return <p className="text-muted-foreground">Caricamento pilota automatico…</p>;
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="flex items-center gap-2">
-          <Switch id="au-enabled" checked={form.enabled} onCheckedChange={(v) => set({ enabled: v })} />
-          <Label htmlFor="au-enabled">Automazione attiva</Label>
+  return (
+    <div className="mt-4 rounded-2xl border border-secondary/40 bg-secondary/5 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-0">
+          <h3 className="font-display text-base font-extrabold">Pilota automatico — {JOB_LABEL[job]}</h3>
+          <p className="text-xs text-muted-foreground">{description}</p>
         </div>
+        <div className="flex items-center gap-2">
+          <Switch id={`job-${job}`} checked={enabled} onCheckedChange={setEnabled} />
+          <Label htmlFor={`job-${job}`}>{enabled ? "Attivo" : "Disattivo"}</Label>
+        </div>
+      </div>
+
+      <div className="mt-3 flex flex-wrap items-end gap-3">
         <div className="grid gap-1.5">
-          <Label htmlFor="au-time">Orario di esecuzione</Label>
+          <Label htmlFor={`time-${job}`}>Ora di esecuzione (UTC)</Label>
           <Input
-            id="au-time"
+            id={`time-${job}`}
             type="time"
-            value={form.run_at.slice(0, 5)}
-            onChange={(e) => set({ run_at: `${e.target.value}:00` })}
+            value={runAt}
+            onChange={(e) => setRunAt(e.target.value)}
+            className="w-36"
           />
         </div>
-        <div className="grid gap-1.5">
-          <Label htmlFor="au-dow">Giorno di fine stagione</Label>
-          <select
-            id="au-dow"
-            className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-            value={form.season_end_dow}
-            onChange={(e) => set({ season_end_dow: Number(e.target.value) })}
-          >
-            {DOW.map((d, i) => (
-              <option key={d} value={i + 1}>
-                {d}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="flex flex-col justify-center gap-2">
-          <div className="flex items-center gap-2">
-            <Switch id="au-chat" checked={form.clear_chat} onCheckedChange={(v) => set({ clear_chat: v })} />
-            <Label htmlFor="au-chat">Svuota la chat</Label>
-          </div>
-          <div className="flex items-center gap-2">
-            <Switch id="au-wheel" checked={form.refresh_wheel} onCheckedChange={(v) => set({ refresh_wheel: v })} />
-            <Label htmlFor="au-wheel">Aggiorna la ruota del mattino</Label>
-          </div>
-        </div>
-      </div>
-
-      <h3 className="mb-2 mt-5 font-extrabold">Premi della ruota generata</h3>
-      <div className="space-y-2">
-        {form.wheel_template.map((p, i) => (
-          <div key={i} className="grid gap-2 rounded-xl bg-muted/50 p-2 sm:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_auto]">
-            <Input value={p.label} placeholder="Etichetta" onChange={(e) => updatePrize(i, { label: e.target.value })} />
-            <Input
-              type="number"
-              value={p.credits}
-              placeholder="Crediti"
-              onChange={(e) => updatePrize(i, { credits: Number(e.target.value) })}
-            />
-            <Input
-              type="number"
-              value={p.points}
-              placeholder="Punti"
-              onChange={(e) => updatePrize(i, { points: Number(e.target.value) })}
-            />
-            <Input
-              type="number"
-              value={p.weight}
-              placeholder="Peso"
-              onChange={(e) => updatePrize(i, { weight: Number(e.target.value) })}
-            />
-            <Button
-              variant="ghost"
-              onClick={() => set({ wheel_template: form.wheel_template.filter((_, idx) => idx !== i) })}
-            >
-              Rimuovi
-            </Button>
-          </div>
-        ))}
-        {form.wheel_template.length === 0 && (
-          <p className="text-sm text-muted-foreground">Nessun premio: la ruota resterà quella attuale.</p>
-        )}
-      </div>
-      <Button
-        variant="outline"
-        className="mt-2"
-        onClick={() => set({ wheel_template: [...form.wheel_template, { label: "", credits: 0, points: 0, weight: 10 }] })}
-      >
-        Aggiungi premio
-      </Button>
-
-      <div className="mt-5 flex flex-wrap items-center gap-2">
         <Button onClick={save} disabled={busy}>
-          {busy ? "Salvo…" : "Salva automazione"}
+          {busy ? "Salvo…" : "Salva pianificazione"}
         </Button>
         <Button variant="outline" onClick={runNow} disabled={busy}>
           Esegui adesso
         </Button>
-        <span className="text-xs text-muted-foreground">
-          Ultima esecuzione: {form.last_run_date ?? "mai"}
-        </span>
+        <span className="text-xs text-muted-foreground">Ultima esecuzione: {current?.last_run_date ?? "mai"}</span>
       </div>
+      {payloadHint && <p className="mt-2 text-xs text-muted-foreground">{payloadHint}</p>}
+    </div>
+  );
+}
+
+function StreakSection() {
+  return (
+    <section className="pop-card p-4">
+      <h2 className="font-display text-lg font-extrabold">Streak 7 giorni</h2>
+      <p className="text-sm text-muted-foreground">
+        Il premio della streak si configura nella sezione "Sfida settimanale" e viene accreditato automaticamente al 7°
+        accesso consecutivo. Qui puoi pianificare l'azzeramento della streak per tutti i giocatori.
+      </p>
+      <JobScheduler
+        job="streak"
+        description="All'orario indicato la streak di tutti i giocatori riparte da zero e inizia un nuovo ciclo di 7 giorni."
+      />
     </section>
   );
 }
@@ -1059,14 +1043,79 @@ function StyleStudio({ data, onDone }: { data: AdminOverview; onDone: () => void
             />
             <Label htmlFor="cs-active">Attivo</Label>
           </div>
+
+          <div className="grid gap-1.5">
+            <Label htmlFor="cs-crown">Corona sopra la cornice</Label>
+            <select
+              id="cs-crown"
+              className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+              value={draft.style.crown ?? ""}
+              onChange={(e) => set({ crown: e.target.value })}
+            >
+              {CROWN_PRESETS.map((c) => (
+                <option key={c || "none"} value={c}>
+                  {c || "nessuna"}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="cs-crown-anim">Animazione corona</Label>
+            <select
+              id="cs-crown-anim"
+              className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+              value={draft.style.crown_animation ?? "none"}
+              onChange={(e) => set({ crown_animation: e.target.value as NonNullable<CosmeticStyle["crown_animation"]> })}
+            >
+              {CROWN_ANIMATIONS.map((a) => (
+                <option key={a} value={a}>
+                  {a}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="cs-crown-size">Dimensione corona (px)</Label>
+            <Input
+              id="cs-crown-size"
+              type="number"
+              min={8}
+              max={64}
+              value={draft.style.crown_size ?? 18}
+              onChange={(e) => set({ crown_size: Math.max(8, Number(e.target.value)) })}
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="cs-crown-offset">Distanza dall'alto (px)</Label>
+            <Input
+              id="cs-crown-offset"
+              type="number"
+              min={0}
+              max={48}
+              value={draft.style.crown_offset ?? 10}
+              onChange={(e) => set({ crown_offset: Math.max(0, Number(e.target.value)) })}
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="cs-crown-tilt">Inclinazione corona (°)</Label>
+            <Input
+              id="cs-crown-tilt"
+              type="number"
+              min={-90}
+              max={90}
+              value={draft.style.crown_tilt ?? 0}
+              onChange={(e) => set({ crown_tilt: Number(e.target.value) })}
+            />
+          </div>
         </div>
 
         <div className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-muted/40 p-6">
           <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Anteprima live</span>
           <span
-            className={`grid h-20 w-20 place-items-center rounded-full bg-card text-3xl ${cosmeticAnimClass(draft.style)}`}
+            className={`relative grid h-20 w-20 place-items-center rounded-full bg-card text-3xl ${cosmeticAnimClass(draft.style)}`}
             style={cosmeticCss(draft.style)}
           >
+            <CrownBadge style={draft.style} />
             🐣
           </span>
           <span className="text-sm font-extrabold">{draft.name || "Nuovo stile"}</span>

@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { Ticket, Coins, Trophy, Users, Sparkles, RefreshCw, Video, Lock, Crown, Shield, Timer, Flame } from "lucide-react";
 import { AppShell, useGameState } from "@/components/AppShell";
 import { useAdPlayer } from "@/components/AdPlayer";
+import { SpinWheel } from "@/components/SpinWheel";
+import { DayRecap } from "@/components/DayRecap";
 import { api, frameClass, difficultyLabel, difficultyTone, type Difficulty } from "@/lib/api";
 import { Cosmetic } from "@/lib/cosmetics";
 import { Button } from "@/components/ui/button";
@@ -40,6 +42,9 @@ function HomePage() {
   const [quiz, setQuiz] = useState<QuizDraw | null>(null);
   const [result, setResult] = useState<QuizResult | null>(null);
   const [wheelResult, setWheelResult] = useState<string | null>(null);
+  const [spinTarget, setSpinTarget] = useState<number | null>(null);
+  const [spinning, setSpinning] = useState(false);
+  const [pendingPrize, setPendingPrize] = useState<{ label: string; credits: number; points: number } | null>(null);
   const [left, setLeft] = useState(0);
   const answering = useRef(false);
 
@@ -106,6 +111,29 @@ function HomePage() {
     if (!t) return null;
     return t === "A" ? state.week.team_a : state.week.team_b;
   }, [state]);
+
+  const wheelPrizes = useMemo(() => state?.wheel_prizes ?? [], [state]);
+
+  async function spin(extra: boolean) {
+    if (spinning) return;
+    setSpinning(true);
+    setBusy(true);
+    try {
+      let token: string | null = null;
+      if (extra) {
+        token = await playAd("wheel");
+        if (!token) throw new Error("Video non completato");
+      }
+      const r = await api.spinWheel(extra, token);
+      setPendingPrize({ label: r.label, credits: r.credits, points: r.points });
+      setSpinTarget(r.index);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Giro non riuscito");
+      setSpinning(false);
+    } finally {
+      setBusy(false);
+    }
+  }
 
   const claimedRef = useRef<string | null>(null);
   useEffect(() => {
@@ -271,9 +299,13 @@ function HomePage() {
 
             <div className="relative overflow-hidden rounded-2xl border border-secondary/40 bg-gradient-to-br from-secondary/20 to-transparent p-5">
               <Users className="absolute -right-3 -top-3 h-20 w-20 text-secondary/20" />
-              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Premio Squadra</p>
+              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                Premio Squadra · Titolo esclusivo
+              </p>
               <p className="mt-1 text-lg font-extrabold">{state.week.prize_team}</p>
-              <p className="mt-1 text-xs text-muted-foreground">A tutti i membri della squadra vincitrice</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Titolo esclusivo assegnato a tutti i membri della squadra vincitrice a fine stagione
+              </p>
             </div>
 
             <div className="pop-card flex flex-col gap-3 border border-primary/40 bg-gradient-to-br from-primary/15 to-transparent p-4 sm:col-span-2">
@@ -357,7 +389,7 @@ function HomePage() {
                 <Ticket className="h-5 w-5 text-primary" /> Ticket
               </h2>
               <p className="text-sm text-muted-foreground">
-                {state.base_left} base · {state.bonus_left} bonus · video rimasti {state.videos_left}
+                {state.base_left} giornalieri · {state.bonus_left} bonus accumulati · video rimasti {state.videos_left}
               </p>
             </div>
             <div className="flex shrink-0 flex-wrap justify-end gap-1 text-xl">
@@ -387,9 +419,20 @@ function HomePage() {
               <Video className="mr-1.5 h-4 w-4" /> Video: +1 ticket
             </Button>
             <span className="text-xs text-muted-foreground">
-              {state.base_left > 0 ? "Disponibile a ticket base esauriti" : `Video usati: ${state.videos_used}/3`}
+              {state.base_left > 0 || state.bonus_left > 0
+                ? "Disponibile solo quando ticket giornalieri e bonus sono a zero"
+                : `Video usati: ${state.videos_used}/${state.videos_used + state.videos_left}`}
             </span>
           </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Ordine di consumo: prima i ticket giornalieri, poi i bonus accumulati, infine i video.
+          </p>
+
+          {state.tickets === 0 && state.day_results.length > 0 && (
+            <div className="mt-4">
+              <DayRecap results={state.day_results} points={state.stats.week_points} teamName={teamName} />
+            </div>
+          )}
         </section>
 
         {/* RUOTA */}
@@ -398,35 +441,40 @@ function HomePage() {
             <Sparkles className="h-5 w-5 text-warning" /> Ruota del Mattino
           </h2>
           <p className="text-sm text-muted-foreground">
-            Un giro gratis al giorno più un giro extra con video. I premi seguono il calendario impostato dallo staff.
+            Un giro gratis al giorno più un giro extra con video. Gli spicchi mostrano i premi di oggi.
           </p>
-          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-            <Button
-              className="gradient-pop font-bold"
-              disabled={busy || !state.wheel_free_available}
-              onClick={() =>
-                run(async () => {
-                  const r = await api.spinWheel(false, null);
-                  setWheelResult(r.label);
-                })
-              }
-            >
-              {state.wheel_free_available ? "Giro gratuito" : "Giro gratuito usato"}
-            </Button>
-            <Button
-              variant="secondary"
-              disabled={busy || !state.wheel_extra_available || state.wheel_free_available}
-              onClick={() =>
-                run(async () => {
-                  const token = await playAd("wheel");
-                  if (!token) throw new Error("Video non completato");
-                  const r = await api.spinWheel(true, token);
-                  setWheelResult(r.label);
-                })
-              }
-            >
-              <Video className="mr-1.5 h-4 w-4" /> Giro extra
-            </Button>
+
+          <div className="mt-4 flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:justify-center">
+            <SpinWheel
+              prizes={wheelPrizes}
+              target={spinTarget}
+              size={250}
+              onSettled={() => {
+                if (pendingPrize) setWheelResult(pendingPrize.label);
+                setSpinTarget(null);
+                setSpinning(false);
+                void refresh();
+              }}
+            />
+            <div className="flex w-full flex-col gap-2 sm:w-auto">
+              <Button
+                className="gradient-pop font-bold"
+                disabled={busy || spinning || !state.wheel_free_available}
+                onClick={() => void spin(false)}
+              >
+                {state.wheel_free_available ? "Giro gratuito" : "Giro gratuito usato"}
+              </Button>
+              <Button
+                variant="secondary"
+                disabled={busy || spinning || !state.wheel_extra_available || state.wheel_free_available}
+                onClick={() => void spin(true)}
+              >
+                <Video className="mr-1.5 h-4 w-4" /> Giro extra
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                {wheelPrizes.length} premi in palio oggi · assegnazione validata dal server
+              </p>
+            </div>
           </div>
         </section>
 

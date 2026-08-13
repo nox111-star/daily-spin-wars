@@ -51,6 +51,19 @@ export type CosmeticRow = {
 };
 
 
+export type DayResult = { difficulty: string; ok: boolean; expired?: boolean; points?: number };
+
+export type JobName = "wheel" | "week" | "streak" | "chat";
+
+export type AutoJob = {
+  job: JobName;
+  enabled: boolean;
+  run_at: string;
+  payload: Record<string, unknown>;
+  last_run_date: string | null;
+  last_run_detail: Record<string, unknown> | null;
+};
+
 export type TeamFlow = {
   mode: "monday_free" | "proposal" | "locked";
   proposal: "A" | "B" | null;
@@ -69,6 +82,8 @@ export type GameState = {
   videos_used: number;
   videos_left: number;
   can_watch_ticket_video: boolean;
+  day_results: DayResult[];
+  wheel_prizes: WheelPrize[];
   team: "A" | "B" | null;
   streak: StreakState;
   styles: StyleMap;
@@ -189,6 +204,7 @@ export type AdminOverview = {
   shop: ShopItem[];
   presets: ChatPreset[];
   styles: CosmeticRow[];
+  jobs: Partial<Record<JobName, AutoJob>>;
 };
 
 
@@ -207,7 +223,16 @@ export const api = {
   claimAdTicket: (token: string) => rpc<{ bonus_left: number; videos_left: number }>("claim_ad_ticket", { p_token: token }),
 
   spinWheel: (extra: boolean, token: string | null) =>
-    rpc<{ label: string; credits: number; points: number }>("spin_morning_wheel", { p_extra: extra, p_token: token }),
+    rpc<{ label: string; credits: number; points: number; index: number; prizes: WheelPrize[] }>("spin_morning_wheel", {
+      p_extra: extra,
+      p_token: token,
+    }),
+
+  adminListJobs: () => rpc<Partial<Record<JobName, AutoJob>>>("admin_list_jobs"),
+  adminSetJob: (job: JobName, enabled: boolean, runAt: string, payload: Record<string, unknown>) =>
+    rpc<{ ok: boolean }>("admin_set_job", { p_job: job, p_enabled: enabled, p_run_at: runAt, p_payload: payload }),
+  adminRunJob: (job: JobName) =>
+    rpc<{ ok: boolean; detail?: Record<string, unknown>; reason?: string }>("admin_run_job", { p_job: job }),
 
   drawQuiz: () =>
     rpc<{ id: number; question: string; options: string[]; difficulty: Difficulty; seconds_left: number }>("draw_quiz"),
