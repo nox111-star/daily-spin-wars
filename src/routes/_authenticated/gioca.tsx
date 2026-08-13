@@ -42,6 +42,9 @@ function HomePage() {
   const [quiz, setQuiz] = useState<QuizDraw | null>(null);
   const [result, setResult] = useState<QuizResult | null>(null);
   const [wheelResult, setWheelResult] = useState<string | null>(null);
+  const [spinTarget, setSpinTarget] = useState<number | null>(null);
+  const [spinning, setSpinning] = useState(false);
+  const [pendingPrize, setPendingPrize] = useState<{ label: string; credits: number; points: number } | null>(null);
   const [left, setLeft] = useState(0);
   const answering = useRef(false);
 
