@@ -1034,6 +1034,70 @@ function StyleStudio({ data, onDone }: { data: AdminOverview; onDone: () => void
             />
             <Label htmlFor="cs-active">Attivo</Label>
           </div>
+
+          <div className="grid gap-1.5">
+            <Label htmlFor="cs-crown">Corona sopra la cornice</Label>
+            <select
+              id="cs-crown"
+              className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+              value={draft.style.crown ?? ""}
+              onChange={(e) => set({ crown: e.target.value })}
+            >
+              {CROWN_PRESETS.map((c) => (
+                <option key={c || "none"} value={c}>
+                  {c || "nessuna"}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="cs-crown-anim">Animazione corona</Label>
+            <select
+              id="cs-crown-anim"
+              className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+              value={draft.style.crown_animation ?? "none"}
+              onChange={(e) => set({ crown_animation: e.target.value as NonNullable<CosmeticStyle["crown_animation"]> })}
+            >
+              {CROWN_ANIMATIONS.map((a) => (
+                <option key={a} value={a}>
+                  {a}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="cs-crown-size">Dimensione corona (px)</Label>
+            <Input
+              id="cs-crown-size"
+              type="number"
+              min={8}
+              max={64}
+              value={draft.style.crown_size ?? 18}
+              onChange={(e) => set({ crown_size: Math.max(8, Number(e.target.value)) })}
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="cs-crown-offset">Distanza dall'alto (px)</Label>
+            <Input
+              id="cs-crown-offset"
+              type="number"
+              min={0}
+              max={48}
+              value={draft.style.crown_offset ?? 10}
+              onChange={(e) => set({ crown_offset: Math.max(0, Number(e.target.value)) })}
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <Label htmlFor="cs-crown-tilt">Inclinazione corona (°)</Label>
+            <Input
+              id="cs-crown-tilt"
+              type="number"
+              min={-90}
+              max={90}
+              value={draft.style.crown_tilt ?? 0}
+              onChange={(e) => set({ crown_tilt: Number(e.target.value) })}
+            />
+          </div>
         </div>
 
         <div className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-muted/40 p-6">
