@@ -91,12 +91,12 @@ function AdminPage() {
           <Tabs defaultValue="quiz">
             <TabsList className="mb-4 flex w-full flex-wrap justify-start gap-1">
               <TabsTrigger value="quiz">Quiz</TabsTrigger>
-              <TabsTrigger value="wheel">Ruota 10 giorni</TabsTrigger>
+              <TabsTrigger value="wheel">Ruota 10 gg</TabsTrigger>
               <TabsTrigger value="week">Sfida settimanale</TabsTrigger>
+              <TabsTrigger value="streak">Streak 7 gg</TabsTrigger>
+              <TabsTrigger value="chat">Chat</TabsTrigger>
               <TabsTrigger value="shop">Shop</TabsTrigger>
               <TabsTrigger value="styles">Editor grafico</TabsTrigger>
-              <TabsTrigger value="auto">Automazioni</TabsTrigger>
-              <TabsTrigger value="chat">Chat</TabsTrigger>
               <TabsTrigger value="live">Live monitor</TabsTrigger>
             </TabsList>
 
@@ -109,15 +109,14 @@ function AdminPage() {
             <TabsContent value="week">
               <WeekConfig data={data} onDone={refresh} />
             </TabsContent>
+            <TabsContent value="streak">
+              <StreakSection />
+            </TabsContent>
             <TabsContent value="shop">
               <ShopAdmin data={data} onDone={refresh} />
             </TabsContent>
             <TabsContent value="styles">
               <StyleStudio data={data} onDone={refresh} />
-            </TabsContent>
-
-            <TabsContent value="auto">
-              <AutomationPanel />
             </TabsContent>
             <TabsContent value="chat">
               <ChatCleanup onDone={refresh} />
