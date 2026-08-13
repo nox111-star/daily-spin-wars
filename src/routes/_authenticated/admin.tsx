@@ -1112,9 +1112,10 @@ function StyleStudio({ data, onDone }: { data: AdminOverview; onDone: () => void
         <div className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-muted/40 p-6">
           <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Anteprima live</span>
           <span
-            className={`grid h-20 w-20 place-items-center rounded-full bg-card text-3xl ${cosmeticAnimClass(draft.style)}`}
+            className={`relative grid h-20 w-20 place-items-center rounded-full bg-card text-3xl ${cosmeticAnimClass(draft.style)}`}
             style={cosmeticCss(draft.style)}
           >
+            <CrownBadge style={draft.style} />
             🐣
           </span>
           <span className="text-sm font-extrabold">{draft.name || "Nuovo stile"}</span>
