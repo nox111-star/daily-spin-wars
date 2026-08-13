@@ -299,9 +299,13 @@ function HomePage() {
 
             <div className="relative overflow-hidden rounded-2xl border border-secondary/40 bg-gradient-to-br from-secondary/20 to-transparent p-5">
               <Users className="absolute -right-3 -top-3 h-20 w-20 text-secondary/20" />
-              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Premio Squadra</p>
+              <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                Premio Squadra · Titolo esclusivo
+              </p>
               <p className="mt-1 text-lg font-extrabold">{state.week.prize_team}</p>
-              <p className="mt-1 text-xs text-muted-foreground">A tutti i membri della squadra vincitrice</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Titolo esclusivo assegnato a tutti i membri della squadra vincitrice a fine stagione
+              </p>
             </div>
 
             <div className="pop-card flex flex-col gap-3 border border-primary/40 bg-gradient-to-br from-primary/15 to-transparent p-4 sm:col-span-2">
