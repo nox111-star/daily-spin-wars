@@ -112,6 +112,29 @@ function HomePage() {
     return t === "A" ? state.week.team_a : state.week.team_b;
   }, [state]);
 
+  const wheelPrizes = useMemo(() => state?.wheel_prizes ?? [], [state]);
+
+  async function spin(extra: boolean) {
+    if (spinning) return;
+    setSpinning(true);
+    setBusy(true);
+    try {
+      let token: string | null = null;
+      if (extra) {
+        token = await playAd("wheel");
+        if (!token) throw new Error("Video non completato");
+      }
+      const r = await api.spinWheel(extra, token);
+      setPendingPrize({ label: r.label, credits: r.credits, points: r.points });
+      setSpinTarget(r.index);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Giro non riuscito");
+      setSpinning(false);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   const claimedRef = useRef<string | null>(null);
   useEffect(() => {
     const claimed = state?.streak.claimed;
