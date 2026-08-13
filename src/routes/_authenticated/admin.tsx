@@ -524,6 +524,13 @@ function ChatCleanup({ onDone }: { onDone: () => void }) {
           {busy ? "Pulisco…" : "Pulisci chat"}
         </Button>
       </div>
+
+      <JobScheduler
+        job="chat"
+        payload={{ keep_hours: hours }}
+        description="All'orario indicato la chat viene svuotata automaticamente."
+        payloadHint="Salvando la pianificazione viene memorizzato il numero di ore da conservare indicato qui sopra."
+      />
     </section>
   );
 }
