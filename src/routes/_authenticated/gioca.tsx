@@ -415,9 +415,20 @@ function HomePage() {
               <Video className="mr-1.5 h-4 w-4" /> Video: +1 ticket
             </Button>
             <span className="text-xs text-muted-foreground">
-              {state.base_left > 0 ? "Disponibile a ticket base esauriti" : `Video usati: ${state.videos_used}/3`}
+              {state.base_left > 0 || state.bonus_left > 0
+                ? "Disponibile solo quando ticket giornalieri e bonus sono a zero"
+                : `Video usati: ${state.videos_used}/${state.videos_used + state.videos_left}`}
             </span>
           </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Ordine di consumo: prima i ticket giornalieri, poi i bonus accumulati, infine i video.
+          </p>
+
+          {state.tickets === 0 && state.day_results.length > 0 && (
+            <div className="mt-4">
+              <DayRecap results={state.day_results} points={state.stats.week_points} teamName={teamName} />
+            </div>
+          )}
         </section>
 
         {/* RUOTA */}
